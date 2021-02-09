@@ -69,8 +69,8 @@ fprintf('\nTrue parameters\n');
 fprintf('Alpha:%8.4f',b_true(1));
 fprintf('  Beta:%8.4f',b_true(2));
 fprintf('  Sigma:%8.4f\n',b_true(3));
-fprintf('Se(a):%8.4f',var_true(1,1)^0.5);
-fprintf('  Se(b):%7.4f\n',var_true(2,2)^0.5);
+%fprintf('Se(a):%8.4f',var_true(1,1)^0.5);
+%fprintf('  Se(b):%7.4f\n',var_true(2,2)^0.5);
 % print your results: means across Monte-Carlo repetitions
 fprintf('\n');
 fprintf('OLS Estimation\n');
@@ -132,7 +132,7 @@ standard_dev2=std(b_hat_all(2,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
+fprintf('\nNON-SORTED PAIRWISE ESTIMATION\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));

@@ -10,7 +10,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 50; % number of observations
 
 %%%%%%%%%%%%%%%%%%%
 % DATA GENERATION %
