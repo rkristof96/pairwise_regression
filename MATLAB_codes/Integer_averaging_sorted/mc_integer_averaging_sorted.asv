@@ -85,27 +85,33 @@ fprintf('  Beta:%8.4f',standard_dev2);
 % AVERAGING Y %
 %%%%%%%%%%%%%%
 
-y_averaged = zeros(length(x),1);
+x = unique(x);
+T = length(x);
+y_averaged = zeros(T,reps);
 
-place_holder=1;
-for i=(1:T)
-    if i==1
-        current_sum=y(i,1);
-        current_counter=1;
-    elseif x(i,1)~=x(i-1,1)
-        current_y=current_sum/current_counter;
-        y_averaged(place_holder,1)=current_y;
-        current_sum=y(i,1);
-        current_counter=1;        
-        place_holder=place_holder+1;
-    else
-        current_sum=current_sum+y(i,1);
-        current_counter=current_counter+1;
+for r=(1:reps)
+    place_holder=1;
+    for i=(1:T)
+        if i==1
+            current_sum=y(i,r);
+            current_counter=1;
+        elseif x(i,1)~=x(i-1,1)
+            current_y=current_sum/current_counter;
+            y_averaged(place_holder,r)=current_y;
+            current_sum=y(i,r);
+            current_counter=1;        
+            place_holder=place_holder+1;
+            if i==T
+                y_averaged(place_holder,r)=current_sum;
+            end;
+        else
+            current_sum=current_sum+y(i,r);
+            current_counter=current_counter+1;
+            
+        end;
     end;
 end;
-
 y = y_averaged;
-T = length(x);
 
 %%%%%%%%%%%%%%
 % AVERAGED SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST) %
@@ -116,40 +122,38 @@ b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th 
 r = 1;
 while r < reps+0.5
     pairwise_betas=zeros(2,T);
-    
     for i=(1:1:T)
         if i~=T
             % calculate betahat
-            x_avg     = mean(x_sorted(i:i+1));
+            x_avg     = mean(x(i:i+1));
             y_avg     = mean(y(i:i+1, r));
             numerator = 0;
             denominator = 0;
             for j=(0:1:1)
-                x_dev = x_sorted(i+j,1)-x_avg;
+                x_dev = x(i+j,1)-x_avg;
                 y_dev = y(i+j,r)-y_avg;
                 numerator = numerator + x_dev*y_dev;
                 denominator = denominator + x_dev*x_dev;
             end;
             b_hat     = numerator/denominator;
-            alpha_hat = mean(y(i:i+1,r)) - b_hat*mean(x_sorted(i:i+1));
+            alpha_hat = mean(y(i:i+1,r)) - b_hat*mean(x(i:i+1));
             pairwise_betas(1,i)=alpha_hat;
             pairwise_betas(2,i)=b_hat;
         else
-            x_sorted_first_and_last = [x_sorted(1); x_sorted(T)];
+            x_first_and_last = [x(1); x(T)];
             y_first_and_last = [y(1,r); y(T,r)];
-            % calculate betahat
-            x_avg     = mean(x_sorted_first_and_last);
+            x_avg     = mean(x_first_and_last);
             y_avg     = mean(y_first_and_last);
             numerator = 0;
             denominator = 0;
             for j=(1:1:2)
-                x_dev = x_sorted_first_and_last(j,1)-x_avg;
+                x_dev = x_first_and_last(j,1)-x_avg;
                 y_dev = y_first_and_last(j,1)-y_avg;
                 numerator = numerator + x_dev*y_dev;
                 denominator = denominator + x_dev*x_dev;
             end;
             b_hat     = numerator/denominator;
-            alpha_hat = mean(y_first_and_last) - b_hat*mean(x_sorted_first_and_last);
+            alpha_hat = mean(y_first_and_last) - b_hat*mean(x_first_and_last);
             pairwise_betas(1,i)=alpha_hat;
             pairwise_betas(2,i)=b_hat;
         end;

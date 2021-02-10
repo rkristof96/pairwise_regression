@@ -10,7 +10,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -87,25 +87,33 @@ fprintf('  Beta:%8.4f',standard_dev2);
 
 x = unique(x);
 T = length(x);
-y_averaged = zeros(T,1);
+y_averaged = zeros(T,reps);
 
-place_holder=1;
-for i=(1:T)
-    if i==1
-        current_sum=y(i,1);
-        current_counter=1;
-    elseif x(i,1)~=x(i-1,1)
-        current_y=current_sum/current_counter;
-        y_averaged(place_holder,1)=current_y;
-        current_sum=y(i,1);
-        current_counter=1;        
-        place_holder=place_holder+1;
-    else
-        current_sum=current_sum+y(i,1);
-        current_counter=current_counter+1;
-    end;
-end;
-
+for r=(1:reps)
+    place_holder=1;
+    for i=(1:T)
+        if i==1
+            current_sum=y(i,r);
+            current_counter=1;
+        elseif x(i,1)~=x(i-1,1)
+            current_y=current_sum/current_counter;
+            y_averaged(place_holder,r)=current_y;
+            current_sum=y(i,r);
+            current_counter=1;        
+            place_holder=place_holder+1;
+            if i==T
+                y_averaged(place_holder,r)=current_sum;
+            end
+        else
+            current_sum=current_sum+y(i,r);
+            current_counter=current_counter+1;
+            if i==T
+                current_y=current_sum/current_counter;
+                y_averaged(place_holder,r)=current_y;
+            end            
+        end
+    end
+end
 y = y_averaged;
 
 %%%%%%%%%%%%%%
@@ -137,7 +145,6 @@ while r < reps+0.5
         else
             x_first_and_last = [x(1); x(T)];
             y_first_and_last = [y(1,r); y(T,r)];
-            % calculate betahat
             x_avg     = mean(x_first_and_last);
             y_avg     = mean(y_first_and_last);
             numerator = 0;
