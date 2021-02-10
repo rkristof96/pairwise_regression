@@ -5,28 +5,35 @@ clc;
 % true parameters
 
 alpha = 1;
-beta  = 0.5;
+beta  = 0;
 sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
+
+%%%%%%%%%%%%%%%%%%%
+% DATA GENERATION %
+%%%%%%%%%%%%%%%%%%%
+
 % explanatory variable
-x = rand(T,1)*T/4;
+rand('seed',202101);
+% generate x: (Tx1) vector of uniformly distributed random
+%    variables  
+x = rand(T,1)*500;
 x_sorted = sort(x);
-x_floored = floor(x_sorted);
-x = x_floored;
+x = x_sorted;
 
 % error terms
-
-randn('seed',202101);
+% generate i.i.d. error terms, each normally distributed with 0
+%    expected value and sigma^2 variance
+randn('seed',202102);
 eps = normrnd(0,sigma, [T,reps]);
 
-% dependent variables, in each of the repetitions
-
-y = alpha+beta*x_sorted+eps;  % (T x reps) matrix of dependent variables
+% generate the dependent variable
+y = alpha+beta*x+eps;
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
@@ -39,13 +46,13 @@ b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th 
 
 r = 1;
 while r < reps+0.5
-    x_avg     = mean(x_sorted);
+    x_avg     = mean(x);
     y_avg     = mean(y);
     y_avg_r   = y_avg(r);
     numerator = 0;
     denominator = 0;
     for i=(1:1:T)
-        x_dev = x_sorted(i,1)-x_avg;
+        x_dev = x(i,1)-x_avg;
         y_dev = y(i,r)-y_avg_r;
         numerator = numerator + x_dev*y_dev;
         denominator = denominator + x_dev*x_dev;
@@ -85,8 +92,8 @@ fprintf('  Beta:%8.4f',standard_dev2);
 % AVERAGING Y %
 %%%%%%%%%%%%%%
 
-x = unique(x);
-T = length(x);
+x_floored = unique(floor(x));
+T = length(x_floored);
 y_averaged = zeros(T,reps);
 
 for r=(1:reps)
@@ -103,20 +110,26 @@ for r=(1:reps)
             place_holder=place_holder+1;
             if i==T
                 y_averaged(place_holder,r)=current_sum;
-            end;
+            end
         else
             current_sum=current_sum+y(i,r);
             current_counter=current_counter+1;
-            
-        end;
-    end;
-end;
+            if i==T
+                current_y=current_sum/current_counter;
+                y_averaged(place_holder,r)=current_y;
+            end            
+        end
+    end
+end
+
+x = x_floored;
 y = y_averaged;
+T = length(x);
+
 
 %%%%%%%%%%%%%%
-% AVERAGED SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST) %
+% AVERAGED FLOORED SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST) %
 %%%%%%%%%%%%%%
-
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 
 r = 1;

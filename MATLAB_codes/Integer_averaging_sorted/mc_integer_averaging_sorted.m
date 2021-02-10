@@ -14,6 +14,7 @@ T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
+rand('seed',202102);
 x = rand(T,1)*T/4;
 x_sorted = sort(x);
 x_floored = floor(x_sorted);
@@ -26,7 +27,7 @@ eps = normrnd(0,sigma, [T,reps]);
 
 % dependent variables, in each of the repetitions
 
-y = alpha+beta*x_sorted+eps;  % (T x reps) matrix of dependent variables
+y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
@@ -39,13 +40,13 @@ b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th 
 
 r = 1;
 while r < reps+0.5
-    x_avg     = mean(x_sorted);
+    x_avg     = mean(x);
     y_avg     = mean(y);
     y_avg_r   = y_avg(r);
     numerator = 0;
     denominator = 0;
     for i=(1:1:T)
-        x_dev = x_sorted(i,1)-x_avg;
+        x_dev = x(i,1)-x_avg;
         y_dev = y(i,r)-y_avg_r;
         numerator = numerator + x_dev*y_dev;
         denominator = denominator + x_dev*x_dev;

@@ -11,7 +11,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -83,7 +83,7 @@ fprintf('  Beta:%8.4f',standard_dev2);
 
 
 %%%%%%%%%%%%%%
-% SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST) %
+% SORTED PAIRWISE ESTIMATION %
 %%%%%%%%%%%%%%
 
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
@@ -132,7 +132,7 @@ standard_dev2=std(b_hat_all(2,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\nNON-SORTED PAIRWISE ESTIMATION\n');
+fprintf('\nSORTED PAIRWISE ESTIMATION\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
