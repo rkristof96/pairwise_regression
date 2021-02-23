@@ -100,7 +100,7 @@ r = 1;
 while r < reps+0.5
     number_of_betas = T * (T-1) /2;
     pairwise_betas = zeros(2,number_of_betas);
-    delta_x = zeros(1,number_of_betas);
+    delta_y = zeros(1,number_of_betas);
     counter=1;
 
     % iterate over all pairs
@@ -108,7 +108,7 @@ while r < reps+0.5
         for j=(2:1:T)
             if i<j
                 % calculate x difference
-                delta_x(1, counter) = x(j,1) - x(i,1);
+                delta_y(1, counter) = y(j,r) - y(i,r);
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
                 y_avg     = (y(i,r)+y(j,r))/2;
@@ -127,7 +127,8 @@ while r < reps+0.5
         end
     end
     
-    assigned_weight = delta_x';
+    abs_delta_y = abs(delta_y');
+    assigned_weight = abs_delta_y;
     
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);

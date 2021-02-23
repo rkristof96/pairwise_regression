@@ -2,7 +2,7 @@ close all;
 clear all;
 clc;
 
-global delta_x; 
+global assigned_weight; 
 global pairwise_beta0;
 global pairwise_beta1;
 
@@ -118,7 +118,7 @@ while r < reps+0.5
     end
     % Obtain the delta-x weighted average of pairwise betas
     
-    delta_x = diff(x);
+    assigned_weight = diff(x);
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);
     
