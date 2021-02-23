@@ -2,7 +2,7 @@ close all;
 clear all;
 clc;
 
-global delta_x; 
+global assigned_weight; 
 global pairwise_beta0;
 global pairwise_beta1;
 
@@ -128,6 +128,7 @@ while r < reps+0.5
     end
     
     delta_x = delta_x';
+    assigned_weight = delta_x;
     
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);

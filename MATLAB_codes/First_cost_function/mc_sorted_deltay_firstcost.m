@@ -2,8 +2,11 @@ close all;
 clear all;
 clc;
 
-% true parameters
+global assigned_weight; 
+global pairwise_beta0;
+global pairwise_beta1;
 
+% true parameters
 
 alpha = 1;
 beta  = 0.5;
@@ -11,7 +14,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -113,15 +116,24 @@ while r < reps+0.5
         pairwise_betas(1,i)=alpha_hat;
         pairwise_betas(2,i)=b_hat;
     end
-    % Obtain the delta-y weighted average of pairwise betas
     
-    delta_y = diff(y);
-    sum_delta_y = sum(delta_y);
-    weighted_parwise_betas = pairwise_betas*delta_y;
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_y;
+    current_y = y(:,r);
+    delta_y = diff(current_y);
+    abs_delta_y = abs(delta_y);
+    assigned_weight = abs_delta_y;
     
-    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
-    b_hat_all(2,r)        = weighted_average_parwise_betas(2);
+    pairwise_beta0 = pairwise_betas(1, :);
+    pairwise_beta1 = pairwise_betas(2, :);
+    
+    % Optimization part
+
+    x0             = 5;
+    [beta0] = fminunc(@costfunction1_beta0,x0, optimoptions('fminunc','Display','none'));
+    
+    [beta1] = fminunc(@costfunction1_beta1,x0, optimoptions('fminunc','Display','none'));
+    
+    b_hat_all(1,r)        = beta0;
+    b_hat_all(2,r)        = beta1;
 
     r = r + 1;   
     
@@ -136,7 +148,7 @@ standard_dev2=std(b_hat_all(2,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
+fprintf('\n SORTED PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
