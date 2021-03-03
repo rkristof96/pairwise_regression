@@ -131,14 +131,8 @@ while r < reps+0.5
             % calculate betahat
             x_avg     = mean(x(i:i+1));
             y_avg     = mean(y(i:i+1, r));
-            numerator = 0;
-            denominator = 0;
-            for j=(0:1:1)
-                x_dev = x(i+j,1)-x_avg;
-                y_dev = y(i+j,r)-y_avg;
-                numerator = numerator + x_dev*y_dev;
-                denominator = denominator + x_dev*x_dev;
-            end;
+            numerator = y(i+1,r) - y(i,r);
+            denominator = x(i+1,1) - x(i,1);
             b_hat     = numerator/denominator;
             alpha_hat = mean(y(i:i+1,r)) - b_hat*mean(x(i:i+1));
             pairwise_betas(1,i)=alpha_hat;
@@ -148,14 +142,8 @@ while r < reps+0.5
             y_first_and_last = [y(1,r); y(T,r)];
             x_avg     = mean(x_first_and_last);
             y_avg     = mean(y_first_and_last);
-            numerator = 0;
-            denominator = 0;
-            for j=(1:1:2)
-                x_dev = x_first_and_last(j,1)-x_avg;
-                y_dev = y_first_and_last(j,1)-y_avg;
-                numerator = numerator + x_dev*y_dev;
-                denominator = denominator + x_dev*x_dev;
-            end;
+            numerator = y(i,r) - y(1,r);
+            denominator = x(i,1) - x(1,1);
             b_hat     = numerator/denominator;
             alpha_hat = mean(y_first_and_last) - b_hat*mean(x_first_and_last);
             pairwise_betas(1,i)=alpha_hat;

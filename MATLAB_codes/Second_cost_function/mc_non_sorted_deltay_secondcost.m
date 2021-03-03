@@ -112,12 +112,8 @@ while r < reps+0.5
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
                 y_avg     = (y(i,r)+y(j,r))/2;
-                x_dev_i   = x(i,1)-x_avg;
-                y_dev_i   = y(i,r)-y_avg;
-                x_dev_j   = x(j,1)-x_avg;
-                y_dev_j   = y(j,r)-y_avg;           
-                numerator = x_dev_i*y_dev_i + x_dev_j*y_dev_j;
-                denominator = x_dev_i*x_dev_i + x_dev_j*x_dev_j;
+                numerator = y(j,r) - y(i,r);
+                denominator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
                 alpha_hat_i = y_avg - b_hat*y_avg;
                 pairwise_betas(1,counter)=alpha_hat_i;

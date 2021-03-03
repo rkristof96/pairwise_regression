@@ -77,13 +77,9 @@ for i=(1:1:T-1)
         if i<j
             % calculate betahat
             x_avg     = (x(i,1)+x(j,1))/2;
-            y_avg     = (y(i,1)+y(j,1))/2;
-            x_dev_i   = x(i,1)-x_avg;
-            y_dev_i   = y(i,1)-y_avg;
-            x_dev_j   = x(j,1)-x_avg;
-            y_dev_j   = y(j,1)-y_avg;           
-            numerator = x_dev_i*y_dev_i + x_dev_j*y_dev_j;
-            denominator = x_dev_i*x_dev_i + x_dev_j*x_dev_j;
+            y_avg     = (y(i,1)+y(j,1))/2;        
+            numerator = y(j,1) - y(i,1);
+            denominator = x(j,1) - x(i,1);
             b_hat_i     = numerator/denominator;
             alpha_hat_i = y_avg - b_hat*y_avg;
             pairwise_betas_2(1,counter)=alpha_hat_i;

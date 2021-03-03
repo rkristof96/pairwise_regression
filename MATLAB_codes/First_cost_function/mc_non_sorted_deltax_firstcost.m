@@ -15,7 +15,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -111,13 +111,9 @@ while r < reps+0.5
                 delta_x(1, counter) = x(j,1) - x(i,1);
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
-                y_avg     = (y(i,r)+y(j,r))/2;
-                x_dev_i   = x(i,1)-x_avg;
-                y_dev_i   = y(i,r)-y_avg;
-                x_dev_j   = x(j,1)-x_avg;
-                y_dev_j   = y(j,r)-y_avg;           
-                numerator = x_dev_i*y_dev_i + x_dev_j*y_dev_j;
-                denominator = x_dev_i*x_dev_i + x_dev_j*x_dev_j;
+                y_avg     = (y(i,r)+y(j,r))/2;         
+                numerator = y(j,r) - y(i,r);
+                denominator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
                 alpha_hat_i = y_avg - b_hat*y_avg;
                 pairwise_betas(1,counter)=alpha_hat_i;
