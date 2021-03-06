@@ -4,36 +4,42 @@ clc;
 
 % true parameters
 
-
 alpha = 1;
 beta  = 0.5;
 sigma = 1;
+epsilon = 0.5;
 
 b_true = [alpha;beta;sigma];
 
 T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
-% explanatory variable
-x = [1:T]';
 
-% random shuffle
-x = x(randperm(length(x)));
+%%%%%%%%%%%%%%%%%%%
+% DATA GENERATION %
+%%%%%%%%%%%%%%%%%%%
+
+% explanatory variable
+rand('seed',202101);
+% generate x: (Tx1) vector of uniformly distributed random
+%    variables on the interval (-1;+1) 
+x = rand(T,1)*2-1;
+%x = normrnd(50,25, [T,1]);
+
 
 % error terms
+% generate i.i.d. error terms, each normally distributed with 0
+%    expected value and sigma^2 variance
+randn('seed',202102);
+eps = normrnd(0,sigma, [T,reps]);
 
-randn('seed',202101);
-eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
-    %with mean 0 and variance sigma^2
-
-% dependent variables, in each of the repetitions
-
-y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
+% generate the dependent variable
+y = alpha+beta*x+eps;
 
 % sort
 xy = [x y];
 
-xy = sortrows(xy,1);
+%xy = sortrows(xy,1);
 
 x = xy(:,1);
 y = xy(:,2:reps+1);
@@ -91,63 +97,48 @@ fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetit
 fprintf('Alpha:%8.4f',standard_dev1);
 fprintf('  Beta:%8.4f',standard_dev2);
 
-
 %%%%%%%%%%%%%%
-% SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST) %
+% ADJACENT ALMOST EQUI PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)  %
 %%%%%%%%%%%%%%
+b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
 
-b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
+% Calculate d_1
+
+x_differences = diff(x);
+d_1 = mean(x_differences);
+
 
 r = 1;
-while r < reps+0.5
-    pairwise_betas=zeros(2,T);
+while r < reps+0.5 
+    sum_delta_y = 0;
+    N = 0;
+    for i=(1:1:T-1)
+        absolute_deviation = abs(x_differences(i)-d_1);
+        if absolute_deviation<epsilon
+            sum_delta_y = sum_delta_y + y(i+1,r)-y(i,r);
+            N = N+1;
+        end
+    end
     
-    for i=(1:1:T)
-        if i~=T
-            % calculate betahat
-            x_avg     = mean(x(i:i+1));
-            y_avg     = mean(y(i:i+1, r));
-            numerator = y(i+1,r) - y(i,r);
-            denominator = x(i+1,1) - x(i,1);
-            b_hat     = numerator/denominator;
-            alpha_hat = mean(y(i:i+1,r)) - b_hat*mean(x(i:i+1));
-            pairwise_betas(1,i)=alpha_hat;
-            pairwise_betas(2,i)=b_hat;
-        else
-            x_sorted_first_and_last = [x(1); x(T)];
-            y_first_and_last = [y(1,r); y(T,r)];
-            % calculate betahat
-            x_avg     = mean(x_sorted_first_and_last);
-            y_avg     = mean(y_first_and_last);
-            numerator = y(i,r) - y(1,r);
-            denominator = x(i,1) - x(1,1);
-            b_hat     = numerator/denominator;
-            alpha_hat = mean(y_first_and_last) - b_hat*mean(x_sorted_first_and_last);
-            pairwise_betas(1,i)=alpha_hat;
-            pairwise_betas(2,i)=b_hat;
-        end;
-    end;
+    %estimate beta
+    beta_hat = sum_delta_y/(N*d_1);
     
-    average_parwise_betas = mean(pairwise_betas,2);
-    b_hat_all(1,r)        = average_parwise_betas(1,:);
-    b_hat_all(2,r)        = average_parwise_betas(2,:);
+    b_hat_all(1,r)        = beta_hat;
 
     r = r + 1;
 end
 
 standard_dev1=std(b_hat_all(1,:));
 
-standard_dev2=std(b_hat_all(2,:));
-
 %%%%%%%%%%%%
 % PRINTING %
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
+fprintf('\n ADJACENT ALMOST EQUI PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
-fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
-fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
+fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
-fprintf('Alpha:%8.4f',standard_dev1);
-fprintf('  Beta:%8.4f',standard_dev2);
+fprintf('  Beta:%8.4f',standard_dev1);
+
+

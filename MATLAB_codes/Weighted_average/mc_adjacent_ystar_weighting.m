@@ -11,7 +11,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -20,7 +20,6 @@ rand('seed',202101);
 %    variables on the interval (-1;+1) 
 x = rand(T,1)*2-1;
 x_sorted = sort(x);
-x = x_sorted;
 
 % error terms
 
@@ -31,6 +30,14 @@ eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distr
 % dependent variables, in each of the repetitions
 
 y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
+
+% sort
+xy = [x y];
+
+xy = sortrows(xy,1);
+
+x = xy(:,1);
+y = xy(:,2:reps+1);
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
@@ -107,12 +114,16 @@ while r < reps+0.5
         pairwise_betas(1,i)=alpha_hat;
         pairwise_betas(2,i)=b_hat;
     end
-    % Obtain the delta-x weighted average of pairwise betas
     
-    delta_x = diff(x);
-    sum_delta_x = sum(delta_x);
-    weighted_parwise_betas = pairwise_betas*delta_x;
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_x;
+    % Obtain the abs(delta-y) weighted average of pairwise betas
+    
+    current_y = y(:,r);
+    delta_y = diff(current_y);
+    abs_delta_y = abs(delta_y);
+    weighting_delta_y = 1./ abs_delta_y;
+    sum_delta_y = sum(weighting_delta_y);
+    weighted_parwise_betas = pairwise_betas*weighting_delta_y;
+    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_y;
     
     b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);

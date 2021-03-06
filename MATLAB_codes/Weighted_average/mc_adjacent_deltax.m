@@ -11,7 +11,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -19,8 +19,6 @@ rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
 x = rand(T,1)*2-1;
-x_sorted = sort(x);
-x = x_sorted;
 
 % error terms
 
@@ -31,6 +29,14 @@ eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distr
 % dependent variables, in each of the repetitions
 
 y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
+
+% sort
+xy = [x y];
+
+%xy = sortrows(xy,1);
+
+x = xy(:,1);
+y = xy(:,2:reps+1);
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
@@ -87,7 +93,7 @@ fprintf('  Beta:%8.4f',standard_dev2);
 
 
 %%%%%%%%%%%%%%
-% SORTED PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %
+% ADJACENT PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %
 %%%%%%%%%%%%%%
 
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
@@ -107,15 +113,12 @@ while r < reps+0.5
         pairwise_betas(1,i)=alpha_hat;
         pairwise_betas(2,i)=b_hat;
     end
+    % Obtain the delta-x weighted average of pairwise betas
     
-    % Obtain the abs(delta-y) weighted average of pairwise betas
-    
-    current_y = y(:,r);
-    delta_y = diff(current_y);
-    abs_delta_y = abs(delta_y);
-    sum_delta_y = sum(abs_delta_y);
-    weighted_parwise_betas = pairwise_betas*abs_delta_y;
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_y;
+    delta_x = diff(x);
+    sum_delta_x = sum(delta_x);
+    weighted_parwise_betas = pairwise_betas*delta_x;
+    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_x;
     
     b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
@@ -133,7 +136,7 @@ standard_dev2=std(b_hat_all(2,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
+fprintf('\n ADJACENT PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
