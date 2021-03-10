@@ -7,11 +7,11 @@ clc;
 alpha = 1;
 beta  = 0.5;
 sigma = 1;
-epsilon = 0.5;
+epsilon = 1.5;
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 %%%%%%%%%%%%%%%%%%%
@@ -22,8 +22,8 @@ reps = 1000; % number of Monte Carlo repetitions
 rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
-x = rand(T,1)*2-1;
-%x = normrnd(50,25, [T,1]);
+%x = rand(T,1)*2-1;
+x = normrnd(50,25, [T,1]);
 
 % error terms
 
