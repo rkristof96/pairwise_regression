@@ -14,7 +14,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -36,7 +36,7 @@ y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 % sort
 xy = [x y];
 
-xy = sortrows(xy,1);
+%xy = sortrows(xy,1);
 
 x = xy(:,1);
 y = xy(:,2:reps+1);
@@ -118,7 +118,9 @@ while r < reps+0.5
     end
     
     delta_x = diff(x);
-    assigned_weight = delta_x;
+    %abs_x = abs(delta_x);
+    abs_x = delta_x;
+    assigned_weight = abs_x;
     
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);

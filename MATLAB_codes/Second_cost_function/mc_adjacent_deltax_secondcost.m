@@ -14,7 +14,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -22,8 +22,6 @@ rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
 x = rand(T,1)*2-1;
-x_sorted = sort(x);
-x = x_sorted;
 
 % error terms
 
@@ -34,6 +32,14 @@ eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distr
 % dependent variables, in each of the repetitions
 
 y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
+
+% sort
+xy = [x y];
+
+%xy = sortrows(xy,1);
+
+x = xy(:,1);
+y = xy(:,2:reps+1);
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
@@ -90,7 +96,7 @@ fprintf('  Beta:%8.4f',standard_dev2);
 
 
 %%%%%%%%%%%%%%
-% SORTED PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %
+% ADJACENT PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %
 %%%%%%%%%%%%%%
 
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
@@ -110,9 +116,13 @@ while r < reps+0.5
         pairwise_betas(1,i)=alpha_hat;
         pairwise_betas(2,i)=b_hat;
     end
-    % Obtain the delta-x weighted average of pairwise betas
     
-    assigned_weight = diff(x);
+    delta_x = diff(x);
+    %abs_x = abs(delta_x);
+    abs_x = delta_x;
+    assigned_weight = abs_x;
+    %assigned_weight = 1./abs_x;
+    
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);
     
@@ -139,7 +149,7 @@ standard_dev2=std(b_hat_all(2,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n SORTED PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
+fprintf('\n ADJACENT PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
