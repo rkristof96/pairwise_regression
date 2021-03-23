@@ -7,11 +7,11 @@ clc;
 alpha = 1;
 beta  = 0.5;
 sigma = 1;
-epsilon = 0.5;
+epsilon = 0.01;
 
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 
