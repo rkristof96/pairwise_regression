@@ -105,7 +105,7 @@ b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th 
 % Calculate d_1
 
 x_differences = diff(x);
-d_1 = mean(x_differences);
+d_1 = median(x_differences);
 
 
 r = 1;
@@ -140,5 +140,5 @@ fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev1);
-
+fprintf('\n  Number of observations we keep:%8.4f',N);
 

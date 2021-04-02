@@ -12,6 +12,7 @@ global pairwise_beta1;
 alpha = 1;
 beta  = 0.5;
 sigma = 1;
+xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
@@ -22,13 +23,27 @@ reps = 1000; % number of Monte Carlo repetitions
 rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
-x = rand(T,1)*2-1;
+%x = rand(T,1)*2-1;
+%x = rand(T,1)*20-10;
+%x = normrnd(0,5, [T,1]);
+
+Z = normrnd(0,1, [T,1]);
+tau = abs(Z);
+rand('seed',202020);
+U = normrnd(0,1, [T,1]);
+x = xi + tau + U;
 
 % error terms
 
 randn('seed',202101);
-eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
+%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
+
+Z_eps = normrnd(0,1, [T,reps]);
+tau_eps = abs(Z_eps);
+rand('seed',222022);
+U_eps = normrnd(0,1, [T,reps]);
+eps = xi + tau_eps + U_eps;
 
 % dependent variables, in each of the repetitions
 
@@ -37,7 +52,7 @@ y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 % sort
 xy = [x y];
 
-%xy = sortrows(xy,1);
+xy = sortrows(xy,1);
 
 x = xy(:,1);
 y = xy(:,2:reps+1);

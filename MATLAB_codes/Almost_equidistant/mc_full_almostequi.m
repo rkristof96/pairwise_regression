@@ -11,7 +11,7 @@ epsilon = 0.01;
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 %%%%%%%%%%%%%%%%%%%
@@ -124,7 +124,7 @@ while r < reps+0.5
     
     % Calculate d_1
     
-    d_1 = mean(delta_x);
+    d_1 = median(delta_x);
     sum_delta_y = 0;
     N = 0;
     
@@ -156,3 +156,4 @@ fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('\n Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev1);
+fprintf('\n  Number of observations we keep:%8.4f',N);

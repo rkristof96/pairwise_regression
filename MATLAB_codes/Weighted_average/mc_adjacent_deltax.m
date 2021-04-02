@@ -8,6 +8,7 @@ clc;
 alpha = 1;
 beta  = 0.5;
 sigma = 1;
+xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
@@ -31,14 +32,14 @@ x = xi + tau + U;
 % error terms
 
 randn('seed',202101);
-eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
+%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
 
-%Z_eps = normrnd(0,1, [T,reps]);
-%tau_eps = abs(Z_eps);
-%rand('seed',222022);
-%U_eps = normrnd(0,1, [T,reps]);
-%eps = xi + tau + U_eps;
+Z_eps = normrnd(0,1, [T,reps]);
+tau_eps = abs(Z_eps);
+rand('seed',222022);
+U_eps = normrnd(0,1, [T,reps]);
+eps = xi + tau_eps + U_eps;
     
 % dependent variables, in each of the repetitions
 

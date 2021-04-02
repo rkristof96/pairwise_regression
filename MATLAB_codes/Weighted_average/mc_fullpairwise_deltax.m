@@ -12,7 +12,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -21,13 +21,13 @@ rand('seed',202101);
 %    variables on the interval (-1;+1) 
 %x = rand(T,1)*2-1;
 %x = rand(T,1)*20-10;
-%x = normrnd(0,5, [T,1]);
+x = normrnd(0,5, [T,1]);
 
-Z = normrnd(0,1, [T,1]);
-tau = abs(Z);
-rand('seed',202020);
-U = normrnd(0,1, [T,1]);
-x = xi + tau + U;
+%Z = normrnd(0,1, [T,1]);
+%tau = abs(Z);
+%rand('seed',202020);
+%U = normrnd(0,1, [T,1]);
+%x = xi + tau + U;
 
 % error terms
 
