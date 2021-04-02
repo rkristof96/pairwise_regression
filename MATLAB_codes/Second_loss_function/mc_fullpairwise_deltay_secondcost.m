@@ -106,7 +106,7 @@ r = 1;
 while r < reps+0.5
     number_of_betas = T * (T-1) /2;
     pairwise_betas = zeros(2,number_of_betas);
-    y_list = zeros(1,number_of_betas); 
+    delta_y = zeros(1,number_of_betas);
     counter=1;
 
     % iterate over all pairs
@@ -114,10 +114,10 @@ while r < reps+0.5
         for j=(2:1:T)
             if i<j
                 % calculate x difference
-                y_list(1, counter) = y(i,r);
+                delta_y(1, counter) = y(j,r) - y(i,r);
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
-                y_avg     = (y(i,r)+y(j,r))/2;          
+                y_avg     = (y(i,r)+y(j,r))/2;           
                 numerator = y(j,r) - y(i,r);
                 denominator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
@@ -129,7 +129,10 @@ while r < reps+0.5
         end
     end
     
-    assigned_weight = y_list';
+    abs_delta_y = abs(delta_y');
+    %abs_delta_y = delta_y';
+    assigned_weight = abs_delta_y;
+    %assigned_weight = 1./abs_delta_y;
     
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);
@@ -137,9 +140,9 @@ while r < reps+0.5
     % Optimization part
 
     x0             = 5;
-    [beta0] = fminunc(@costfunction2_beta0,x0, optimoptions('fminunc','Display','none'));
+    [beta0] = fminunc(@lossfunction2_beta0,x0, optimoptions('fminunc','Display','none'));
     
-    [beta1] = fminunc(@costfunction2_beta1,x0, optimoptions('fminunc','Display','none'));
+    [beta1] = fminunc(@lossfunction2_beta1,x0, optimoptions('fminunc','Display','none'));
     
     b_hat_all(1,r)        = beta0;
     b_hat_all(2,r)        = beta1;

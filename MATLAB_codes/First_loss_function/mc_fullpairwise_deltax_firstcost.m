@@ -12,23 +12,38 @@ global pairwise_beta1;
 alpha = 1;
 beta  = 0.5;
 sigma = 1;
+xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
-x = rand(T,1)*2-1;
+%x = rand(T,1)*2-1;
+%x = rand(T,1)*20-10;
+%x = normrnd(0,5, [T,1]);
+
+Z = normrnd(0,1, [T,1]);
+tau = abs(Z);
+rand('seed',202020);
+U = normrnd(0,1, [T,1]);
+x = xi + tau + U;
 
 % error terms
 
 randn('seed',202101);
-eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
+%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
+
+Z_eps = normrnd(0,1, [T,reps]);
+tau_eps = abs(Z_eps);
+rand('seed',222022);
+U_eps = normrnd(0,1, [T,reps]);
+eps = xi + tau_eps + U_eps;
 
 % dependent variables, in each of the repetitions
 
@@ -97,7 +112,7 @@ fprintf('  Beta:%8.4f',standard_dev2);
 
 
 %%%%%%%%%%%%%%
-% FULL PAIRWISE ESTIMATION %
+% FULL PAIRWISE PAIRWISE ESTIMATION %
 %%%%%%%%%%%%%%
 
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
@@ -106,7 +121,7 @@ r = 1;
 while r < reps+0.5
     number_of_betas = T * (T-1) /2;
     pairwise_betas = zeros(2,number_of_betas);
-    y_list = zeros(1,number_of_betas); 
+    delta_x = zeros(1,number_of_betas);
     counter=1;
 
     % iterate over all pairs
@@ -114,10 +129,10 @@ while r < reps+0.5
         for j=(2:1:T)
             if i<j
                 % calculate x difference
-                y_list(1, counter) = y(i,r);
+                delta_x(1, counter) = x(j,1) - x(i,1);
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
-                y_avg     = (y(i,r)+y(j,r))/2;          
+                y_avg     = (y(i,r)+y(j,r))/2;         
                 numerator = y(j,r) - y(i,r);
                 denominator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
@@ -129,7 +144,8 @@ while r < reps+0.5
         end
     end
     
-    assigned_weight = y_list';
+    delta_x = delta_x';
+    assigned_weight = delta_x;
     
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);
@@ -137,9 +153,9 @@ while r < reps+0.5
     % Optimization part
 
     x0             = 5;
-    [beta0] = fminunc(@costfunction1_beta0,x0, optimoptions('fminunc','Display','none'));
+    [beta0] = fminunc(@lossfunction1_beta0,x0, optimoptions('fminunc','Display','none'));
     
-    [beta1] = fminunc(@costfunction1_beta1,x0, optimoptions('fminunc','Display','none'));
+    [beta1] = fminunc(@lossfunction1_beta1,x0, optimoptions('fminunc','Display','none'));
     
     b_hat_all(1,r)        = beta0;
     b_hat_all(2,r)        = beta1;
@@ -157,7 +173,7 @@ standard_dev2=std(b_hat_all(2,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n FULL PAIRWISE ESTIMATION\n');
+fprintf('\n FULL PAIRWISE PAIRWISE ESTIMATION\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));

@@ -129,9 +129,9 @@ while r < reps+0.5
     % Optimization part
 
     x0             = 5;
-    [beta0] = fminunc(@costfunction2_beta0,x0, optimoptions('fminunc','Display','none'));
+    [beta0] = fminunc(@lossfunction2_beta0,x0, optimoptions('fminunc','Display','none'));
     
-    [beta1] = fminunc(@costfunction2_beta1,x0, optimoptions('fminunc','Display','none'));
+    [beta1] = fminunc(@lossfunction2_beta1,x0, optimoptions('fminunc','Display','none'));
     
     b_hat_all(1,r)        = beta0;
     b_hat_all(2,r)        = beta1;
