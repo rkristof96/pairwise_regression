@@ -11,8 +11,7 @@ global pairwise_beta1;
 
 alpha = 1;
 beta  = 0.5;
-sigma = 1;
-xi = -sqrt(2/pi);
+sigma = 0.8;
 
 b_true = [alpha;beta;sigma];
 
@@ -21,29 +20,27 @@ reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rand('seed',202101);
-% generate x: (Tx1) vector of uniformly distributed random
-%    variables on the interval (-1;+1) 
-%x = rand(T,1)*2-1;
-%x = rand(T,1)*20-10;
-%x = normrnd(0,5, [T,1]);
+% generate x: (Tx1) u: (Txreps) vector of bi-variate normal distributed
+% random variables
 
-Z = normrnd(0,1, [T,1]);
-tau = abs(Z);
-rand('seed',202020);
-U = normrnd(0,1, [T,1]);
-x = xi + tau + U;
+mu = zeros(1,reps+1);
+cov_matrix = zeros(reps+1);
+cov_matrix(:,:) = 0.65;
 
-% error terms
+cov_matrix(1,:) = sigma;
+cov_matrix(:,1) = sigma;
 
-randn('seed',202101);
-%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
-    %with mean 0 and variance sigma^2
+for i=(1:1:reps+1)
+    cov_matrix(i,i) = 1;
+end
 
-Z_eps = normrnd(0,1, [T,reps]);
-tau_eps = abs(Z_eps);
-rand('seed',222022);
-U_eps = normrnd(0,1, [T,reps]);
-eps = xi + tau_eps + U_eps;
+rng('default')  % For reproducibility
+
+R = mvnrnd(mu,cov_matrix,T);
+
+x = R(:,1);
+eps = R(:,2:end);
+
 
 % dependent variables, in each of the repetitions
 
@@ -153,9 +150,9 @@ while r < reps+0.5
     % Optimization part
 
     x0             = 5;
-    [beta0] = fminunc(@costfunction1_beta0,x0, optimoptions('fminunc','Display','none'));
+    [beta0] = fminunc(@lossfunction1_beta0,x0, optimoptions('fminunc','Display','none'));
     
-    [beta1] = fminunc(@costfunction1_beta1,x0, optimoptions('fminunc','Display','none'));
+    [beta1] = fminunc(@lossfunction1_beta1,x0, optimoptions('fminunc','Display','none'));
     
     b_hat_all(1,r)        = beta0;
     b_hat_all(2,r)        = beta1;

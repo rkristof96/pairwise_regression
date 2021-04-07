@@ -4,54 +4,49 @@ clc;
 
 % true parameters
 
-
 alpha = 1;
 beta  = 0.5;
-sigma = 1;
-xi = -sqrt(2/pi);
+sigma = -0.8;
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rand('seed',202101);
-% generate x: (Tx1) vector of uniformly distributed random
-%    variables on the interval (-1;+1) 
-%x = rand(T,1)*2-1;
-%x = rand(T,1)*20-10;
-%x = normrnd(0,5, [T,1]);
+% generate x: (Tx1) u: (Txreps) vector of bi-variate normal distributed
+% random variables
 
-Z = normrnd(0,1, [T,1]);
-tau = abs(Z);
-rand('seed',202020);
-U = normrnd(0,1, [T,1]);
-x = xi + tau + U;
+mu = zeros(1,reps+1);
+cov_matrix = zeros(reps+1);
+cov_matrix(:,:) = 0.65;
 
-% error terms
+cov_matrix(1,:) = sigma;
+cov_matrix(:,1) = sigma;
 
-randn('seed',202101);
-%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
-    %with mean 0 and variance sigma^2
+for i=(1:1:reps+1)
+    cov_matrix(i,i) = 1;
+end
 
-Z_eps = normrnd(0,1, [T,reps]);
-tau_eps = abs(Z_eps);
-rand('seed',222022);
-U_eps = normrnd(0,1, [T,reps]);
-eps = xi + tau_eps + U_eps;
+rng('default')  % For reproducibility
+
+R = mvnrnd(mu,cov_matrix,T);
+
+x = R(:,1);
+eps = R(:,2:end);
     
 % dependent variables, in each of the repetitions
 
 y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 
 % sort
-xy = [x y];
+x_y = [x y];
 
-xy = sortrows(xy,1);
+x_y = sortrows(x_y,1);
 
-x = xy(:,1);
-y = xy(:,2:reps+1);
+x = x_y(:,1);
+y = x_y(:,2:reps+1);
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
