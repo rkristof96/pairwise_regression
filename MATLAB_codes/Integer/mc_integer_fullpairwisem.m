@@ -4,29 +4,53 @@ clc;
 
 % true parameters
 
-
 alpha = 1;
 beta  = 0.5;
-sigma = 1;
-
+sigma = sqrt(0.5);
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 x = [1:T]';
-x_sorted=x;
 
 % error terms
 
 randn('seed',202101);
 eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
+    
+x_mean = mean(x);
+x_std = std(x);
+
+x_standard = (x-x_mean)/(x_std*sqrt(2));
+
+eps_endog = eps + 10 * x_standard;
+
+% Make epsilon endogenous
+eps = eps_endog;
+
+% random shuffle
+x_and_eps = [x eps];
+
+random_x_and_eps = x_and_eps(randperm(size(x_and_eps, 1)), :);
+
+x = random_x_and_eps(:,1);
+eps = random_x_and_eps(:,2:reps+1);
 
 % dependent variables, in each of the repetitions
 
-y = alpha+beta*x_sorted+eps;  % (T x reps) matrix of dependent variables
+y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
+
+% sort
+x_y_eps = [x y eps];
+
+%x_y_eps = sortrows(x_y_eps,1);
+
+x = x_y_eps(:,1);
+y = x_y_eps(:,2:reps+1);
+eps = x_y_eps(:,reps+2:end);
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
@@ -39,7 +63,7 @@ b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th 
 
 r = 1;
 while r < reps+0.5
-    x_avg     = mean(x_sorted);
+    x_avg     = mean(x);
     y_avg     = mean(y);
     y_avg_r   = y_avg(r);
     numerator = 0;
