@@ -7,11 +7,11 @@ clc;
 alpha = 1;
 beta  = 0.5;
 epsilon = 0.01;
-sigma = 0.1;
+sigma = 0.8;
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 %%%%%%%%%%%%%%%%%%%
@@ -20,62 +20,57 @@ reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rand('seed',202101);
-% generate x: (Txreps) u: (Txreps) vector of bi-variate normal distributed
+% generate x: (Tx1) u: (Txreps) vector of bi-variate normal distributed
 % random variables
 
-x = zeros(T,reps);
-eps = zeros(T,reps);
+mu = zeros(1,reps+1);
+cov_matrix = zeros(reps+1);
+cov_matrix(:,:) = 0.65;
 
-mu = zeros(1,2);
-cov_matrix = zeros(2);
+cov_matrix(1,:) = sigma;
+cov_matrix(:,1) = sigma;
 
-cov_matrix(1,1) = 10;
-cov_matrix(1,2) = sigma;
-cov_matrix(2,1) = sigma;
-cov_matrix(2,2) = 1;
+for i=(1:1:reps+1)
+    cov_matrix(i,i) = 1;
+end
 
 rng('default')  % For reproducibility
-for i=(1:1:reps)
-    R = mvnrnd(mu,cov_matrix,T);
-    x(:,i) = R(:,1);
-    eps(:,i) = R(:,2);
-end
 
-% generate the dependent variable
-y = alpha+beta*x+eps;
+R = mvnrnd(mu,cov_matrix,T);
+
+x = R(:,1);
+eps = R(:,2:end);
+
+% dependent variables, in each of the repetitions
+
+y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 
 % sort
-x_sorted = zeros(T,reps);
-y_sorted = zeros(T,reps);
+xy = [x y];
 
-for i=(1:1:reps)
-    x_to_sort = x(:,i);
-    y_to_sort = y(:,i);
-    xy = [x_to_sort y_to_sort];
-    xy = sortrows(xy,1);
-    x_sorted(:,i) = xy(:,1);
-    y_sorted(:,i) = xy(:,2);
-end
+%xy = sortrows(xy,1);
 
-x = x_sorted;
-y = y_sorted;
+x = xy(:,1);
+y = xy(:,2:reps+1);
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
 %%%%%%%%%%%%%%
 
+x_matr = [ones(T,1) x];  % this is matrix X in betahat = (X'X)^(-1)*(X'y)
+var_true = (sigma^2)*inv(x_matr'*x_matr);  % true variance-covariance matrix
+
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 
 r = 1;
 while r < reps+0.5
-    x_mc = x(:,r);
-    x_avg     = mean(x_mc);
+    x_avg     = mean(x);
     y_avg     = mean(y);
     y_avg_r   = y_avg(r);
     numerator = 0;
     denominator = 0;
     for i=(1:1:T)
-        x_dev = x_mc(i,1)-x_avg;
+        x_dev = x(i,1)-x_avg;
         y_dev = y(i,r)-y_avg_r;
         numerator = numerator + x_dev*y_dev;
         denominator = denominator + x_dev*x_dev;
@@ -99,6 +94,8 @@ fprintf('\nTrue parameters\n');
 fprintf('Alpha:%8.4f',b_true(1));
 fprintf('  Beta:%8.4f',b_true(2));
 fprintf('  Sigma:%8.4f\n',b_true(3));
+fprintf('Se(a):%8.4f',var_true(1,1)^0.5);
+fprintf('  Se(b):%7.4f\n',var_true(2,2)^0.5);
 % print your results: means across Monte-Carlo repetitions
 fprintf('\n');
 fprintf('OLS Estimation\n');
@@ -109,36 +106,51 @@ fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetit
 fprintf('Alpha:%8.4f',standard_dev1);
 fprintf('  Beta:%8.4f',standard_dev2);
 
+
 %%%%%%%%%%%%%%
-% ADJACENT ALMOST EQUI PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)  %
+% Full PAIRWISE ESTIMATION %
 %%%%%%%%%%%%%%
+
 b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
 
-
 r = 1;
-while r < reps+0.5 
-    x_differences = diff(x(:,r));
-    d = median(x_differences);
-    total_deviation = 0;
-    d
+while r < reps+0.5
+    number_of_pairs = T * (T-1) /2;
+    delta_x = zeros(1,number_of_pairs);
+    delta_y = zeros(1,number_of_pairs);
+    counter = 1;
     
+    % iterate over all pairs
+    for i=(1:1:T-1)
+        for j=(2:1:T)
+            if i<j
+                % calculate x difference
+                delta_x(1, counter) = x(j,1) - x(i,1);
+                delta_y(1, counter) = y(j,r) - y(i,r);
+                counter = counter + 1;
+            end
+        end
+    end
+    
+    % Calculate d_1
+    
+    d_1 = median(delta_x);
     sum_delta_y = 0;
     N = 0;
-    for i=(1:1:T-1)
-        absolute_deviation = abs(x_differences(i)-d);
+    
+    for i=(1:1:number_of_pairs)
+        absolute_deviation = abs(delta_x(1, i)-d_1);
         if absolute_deviation<epsilon
-            total_deviation = total_deviation + x_differences(i)-d;
-            sum_delta_y = sum_delta_y + y(i+1,r)-y(i,r);
+            sum_delta_y = sum_delta_y + delta_y(1, i);
             N = N+1;
         end
     end
     
     %estimate beta
-    beta_hat = sum_delta_y/(N*d);
-    beta_hat_corrected = (1+ total_deviation/(d*N))^(-1)*beta_hat;
+    beta_hat = sum_delta_y/(N*d_1);
     
-    b_hat_all(1,r)        = beta_hat_corrected;
-
+    b_hat_all(1,r)        = beta_hat;
+    
     r = r + 1;
 end
 
@@ -149,10 +161,9 @@ standard_dev1=std(b_hat_all(1,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n ADJACENT ALMOST EQUI PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
+fprintf('\n FULL PAIRWISE ESTIMATION\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
-fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
-fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
+fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
+fprintf('\n Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev1);
 fprintf('\n  Number of observations we keep:%8.4f',N);
-

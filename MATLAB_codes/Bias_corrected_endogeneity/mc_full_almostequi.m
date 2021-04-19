@@ -139,6 +139,7 @@ while r < reps+0.5
     
     d = median(delta_x(:,r));
     total_deviation = 0;
+    d
     
     sum_delta_y = 0;
     N = 0;
@@ -150,7 +151,6 @@ while r < reps+0.5
             N = N+1;
         end
     end
-    N
     
     %estimate beta
     beta_hat = sum_delta_y/(N*d);

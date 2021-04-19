@@ -7,12 +7,13 @@ clc;
 alpha = 1;
 beta  = 0.5;
 epsilon = 0.01;
-sigma = 0.1;
+sigma = 0.8;
 
 b_true = [alpha;beta;sigma];
 
 T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
+
 
 %%%%%%%%%%%%%%%%%%%
 % DATA GENERATION %
@@ -20,62 +21,56 @@ reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rand('seed',202101);
-% generate x: (Txreps) u: (Txreps) vector of bi-variate normal distributed
+% generate x: (Tx1) u: (Txreps) vector of bi-variate normal distributed
 % random variables
 
-x = zeros(T,reps);
-eps = zeros(T,reps);
+mu = zeros(1,reps+1);
+cov_matrix = zeros(reps+1);
+cov_matrix(:,:) = 0.65;
 
-mu = zeros(1,2);
-cov_matrix = zeros(2);
+cov_matrix(1,:) = sigma;
+cov_matrix(:,1) = sigma;
 
-cov_matrix(1,1) = 10;
-cov_matrix(1,2) = sigma;
-cov_matrix(2,1) = sigma;
-cov_matrix(2,2) = 1;
+for i=(1:1:reps+1)
+    cov_matrix(i,i) = 1;
+end
 
 rng('default')  % For reproducibility
-for i=(1:1:reps)
-    R = mvnrnd(mu,cov_matrix,T);
-    x(:,i) = R(:,1);
-    eps(:,i) = R(:,2);
-end
+
+R = mvnrnd(mu,cov_matrix,T);
+
+x = R(:,1);
+eps = R(:,2:end);
 
 % generate the dependent variable
 y = alpha+beta*x+eps;
 
 % sort
-x_sorted = zeros(T,reps);
-y_sorted = zeros(T,reps);
+xy = [x y];
 
-for i=(1:1:reps)
-    x_to_sort = x(:,i);
-    y_to_sort = y(:,i);
-    xy = [x_to_sort y_to_sort];
-    xy = sortrows(xy,1);
-    x_sorted(:,i) = xy(:,1);
-    y_sorted(:,i) = xy(:,2);
-end
+%xy = sortrows(xy,1);
 
-x = x_sorted;
-y = y_sorted;
+x = xy(:,1);
+y = xy(:,2:reps+1);
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
 %%%%%%%%%%%%%%
 
+x_matr = [ones(T,1) x];  % this is matrix X in betahat = (X'X)^(-1)*(X'y)
+var_true = (sigma^2)*inv(x_matr'*x_matr);  % true variance-covariance matrix
+
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 
 r = 1;
 while r < reps+0.5
-    x_mc = x(:,r);
-    x_avg     = mean(x_mc);
+    x_avg     = mean(x);
     y_avg     = mean(y);
     y_avg_r   = y_avg(r);
     numerator = 0;
     denominator = 0;
     for i=(1:1:T)
-        x_dev = x_mc(i,1)-x_avg;
+        x_dev = x(i,1)-x_avg;
         y_dev = y(i,r)-y_avg_r;
         numerator = numerator + x_dev*y_dev;
         denominator = denominator + x_dev*x_dev;
@@ -99,6 +94,8 @@ fprintf('\nTrue parameters\n');
 fprintf('Alpha:%8.4f',b_true(1));
 fprintf('  Beta:%8.4f',b_true(2));
 fprintf('  Sigma:%8.4f\n',b_true(3));
+fprintf('Se(a):%8.4f',var_true(1,1)^0.5);
+fprintf('  Se(b):%7.4f\n',var_true(2,2)^0.5);
 % print your results: means across Monte-Carlo repetitions
 fprintf('\n');
 fprintf('OLS Estimation\n');
@@ -114,30 +111,28 @@ fprintf('  Beta:%8.4f',standard_dev2);
 %%%%%%%%%%%%%%
 b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
 
+% Calculate d_1
+
+x_differences = diff(x);
+d_1 = median(x_differences);
+
 
 r = 1;
 while r < reps+0.5 
-    x_differences = diff(x(:,r));
-    d = median(x_differences);
-    total_deviation = 0;
-    d
-    
     sum_delta_y = 0;
     N = 0;
     for i=(1:1:T-1)
-        absolute_deviation = abs(x_differences(i)-d);
+        absolute_deviation = abs(x_differences(i)-d_1);
         if absolute_deviation<epsilon
-            total_deviation = total_deviation + x_differences(i)-d;
             sum_delta_y = sum_delta_y + y(i+1,r)-y(i,r);
             N = N+1;
         end
     end
     
     %estimate beta
-    beta_hat = sum_delta_y/(N*d);
-    beta_hat_corrected = (1+ total_deviation/(d*N))^(-1)*beta_hat;
+    beta_hat = sum_delta_y/(N*d_1);
     
-    b_hat_all(1,r)        = beta_hat_corrected;
+    b_hat_all(1,r)        = beta_hat;
 
     r = r + 1;
 end
