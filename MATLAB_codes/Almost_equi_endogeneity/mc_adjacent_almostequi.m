@@ -7,7 +7,7 @@ clc;
 alpha = 1;
 beta  = 0.5;
 epsilon = 0.01;
-sigma = 0.8;
+sigma = 0.5;
 
 b_true = [alpha;beta;sigma];
 
@@ -116,21 +116,33 @@ b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th 
 x_differences = diff(x);
 d_1 = median(x_differences);
 
-
 r = 1;
 while r < reps+0.5 
-    sum_delta_y = 0;
+    sum_betas = 0;
+    delta_x_sum_betas = 0;
+    inverse_delta_y_sum_betas = 0;
+    length_sum_betas = 0;
+    inverse_length_sum_betas = 0;
     N = 0;
     for i=(1:1:T-1)
         absolute_deviation = abs(x_differences(i)-d_1);
         if absolute_deviation<epsilon
-            sum_delta_y = sum_delta_y + y(i+1,r)-y(i,r);
+            sum_betas = sum_betas + (y(i+1,r)-y(i,r))/x_differences(i);
+            delta_x_sum_betas = delta_x_sum_betas + (y(i+1,r)-y(i,r));
+            inverse_delta_y_sum_betas = inverse_delta_y_sum_betas + 1/x_differences(i);
+            length = sqrt(x_differences(i)^2 + (y(i+1,r)-y(i,r))^2);
+            length_sum_betas = length_sum_betas + length * (y(i+1,r)-y(i,r))/x_differences(i);
+            inverse_length_sum_betas = inverse_length_sum_betas + (1/length) * (y(i+1,r)-y(i,r))/x_differences(i);     
             N = N+1;
         end
     end
     
     %estimate beta
-    beta_hat = sum_delta_y/(N*d_1);
+    %beta_hat = sum_betas/(N);
+    %beta_hat = delta_x_sum_betas/N;
+    %beta_hat = inverse_delta_y_sum_betas/N;
+    %beta_hat = length_sum_betas/N;
+    beta_hat = inverse_length_sum_betas/N;
     
     b_hat_all(1,r)        = beta_hat;
 
