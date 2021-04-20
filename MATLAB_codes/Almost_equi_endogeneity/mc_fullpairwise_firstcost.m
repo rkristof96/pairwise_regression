@@ -2,22 +2,21 @@ close all;
 clear all;
 clc;
 
+global assigned_weight; 
+global pairwise_beta1;
+
 % true parameters
+
 
 alpha = 1;
 beta  = 0.5;
 epsilon = 0.01;
-sigma = 0.5;
+sigma = 0.8;
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
-
-
-%%%%%%%%%%%%%%%%%%%
-% DATA GENERATION %
-%%%%%%%%%%%%%%%%%%%
 
 % explanatory variable
 rand('seed',202101);
@@ -42,8 +41,10 @@ R = mvnrnd(mu,cov_matrix,T);
 x = R(:,1);
 eps = R(:,2:end);
 
-% generate the dependent variable
-y = alpha+beta*x+eps;
+
+% dependent variables, in each of the repetitions
+
+y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 
 % sort
 xy = [x y];
@@ -106,55 +107,105 @@ fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetit
 fprintf('Alpha:%8.4f',standard_dev1);
 fprintf('  Beta:%8.4f',standard_dev2);
 
+
 %%%%%%%%%%%%%%
-% ADJACENT ALMOST EQUI PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)  %
+% FULL PAIRWISE PAIRWISE ESTIMATION %
 %%%%%%%%%%%%%%
+
 b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
 
-% Calculate d_1
+number_of_pairs = T * (T-1) /2;
+delta_x = zeros(1,number_of_pairs);
+counter = 1;
 
-x_differences = diff(x);
-d_1 = median(x_differences);
+% iterate over all pairs
+for i=(1:1:T-1)
+    for j=(2:1:T)
+        if i<j
+            % calculate x difference
+            delta_x(1, counter) = x(j,1) - x(i,1);
+            counter = counter + 1;
+        end
+    end
+end 
+
+d_1 = median(delta_x);
+
+number_to_keep = 0;
+
+for i=(1:1:number_of_pairs)
+    absolute_deviation = abs(delta_x(i)-d_1);
+    if absolute_deviation<epsilon
+        number_to_keep = number_to_keep + 1;
+    end
+end
 
 r = 1;
-while r < reps+0.5 
-    sum_betas = 0;
-    delta_x_sum_betas = 0;
-    inverse_delta_y_sum_betas = 0;
-    length_sum_betas = 0;
-    inverse_length_sum_betas = 0;
-    N = 0;
+while r < reps+0.5
+    delta_y = zeros(1,number_of_pairs);
+    counter = 1;
+
+    % iterate over all pairs
     for i=(1:1:T-1)
-        absolute_deviation = abs(x_differences(i)-d_1);
+        for j=(2:1:T)
+            if i<j
+                % calculate x difference
+                delta_y(1, counter) = y(j,r) - y(i,r);
+                counter = counter + 1;
+            end
+        end
+    end    
+
+    pairwise_betas=zeros(1,number_to_keep);
+    delta_x_weight = zeros(1,number_to_keep);
+    inverse_delta_y = zeros(1,number_to_keep);
+    length = zeros(1,number_to_keep);
+    inverse_length = zeros(1,number_to_keep);
+    counter = 1;
+    
+    % iterate over all pairs
+    for i=(1:1:number_of_pairs)
+        absolute_deviation = abs(delta_x(i)-d_1);
         if absolute_deviation<epsilon
-            sum_betas = sum_betas + (y(i+1,r)-y(i,r))/x_differences(i);
-            delta_x_sum_betas = delta_x_sum_betas + (y(i+1,r)-y(i,r));
-            inverse_delta_y_sum_betas = 0;
-            length_sum_betas = 0;
-            inverse_length_sum_betas = 0;     
-            N = N+1;
+           pairwise_betas(1,counter) = delta_y(i)/delta_x(i);
+           delta_x_weight(1,counter) = delta_x(i);
+           inverse_delta_y(1,counter) = 1/delta_y(i);
+           length(1,counter) = sqrt(delta_x(i)^2 + delta_y(i)^2);
+           inverse_length(1,counter) = 1/(sqrt(delta_x(i)^2 + delta_y(i)^2));
+           counter = counter + 1;
         end
     end
     
-    %estimate beta
-    beta_hat = sum_betas/(N);
+    %assigned_weight = delta_x_weight;
+    %assigned_weight = inverse_delta_y;
+    %assigned_weight = length;
+    assigned_weight = inverse_length;
+        
+    pairwise_beta1 = pairwise_betas(1, :);
     
-    b_hat_all(1,r)        = beta_hat;
+    % Optimization part
+
+    x0             = 5;
+    
+    [beta1] = fminunc(@lossfunction1_beta1,x0, optimoptions('fminunc','Display','none'));
+    
+    b_hat_all(1,r)        = beta1;
+    
 
     r = r + 1;
 end
 
-standard_dev1=std(b_hat_all(1,:));
+standard_dev2=std(b_hat_all(1,:));
 
 %%%%%%%%%%%%
 % PRINTING %
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n ADJACENT ALMOST EQUI PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
+fprintf('\n FULL PAIRWISE PAIRWISE ESTIMATION\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
-fprintf('  Beta:%8.4f',standard_dev1);
-fprintf('\n  Number of observations we keep:%8.4f',N);
+fprintf('  Beta:%8.4f',standard_dev2);
+fprintf('\n  Number of observations we keep:%8.4f',number_to_keep);
 
