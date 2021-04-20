@@ -124,6 +124,9 @@ while r < reps+0.5
     length_sum_betas = 0;
     inverse_length_sum_betas = 0;
     N = 0;
+
+    inverse_abs_delta_y_sum_betas = 0;
+
     for i=(1:1:T-1)
         absolute_deviation = abs(x_differences(i)-d_1);
         if absolute_deviation<epsilon
@@ -134,6 +137,8 @@ while r < reps+0.5
             length_sum_betas = length_sum_betas + length * (y(i+1,r)-y(i,r))/x_differences(i);
             inverse_length_sum_betas = inverse_length_sum_betas + (1/length) * (y(i+1,r)-y(i,r))/x_differences(i);     
             N = N+1;
+            
+            inverse_abs_delta_y_sum_betas = inverse_abs_delta_y_sum_betas + (1/abs(y(i+1,r)-y(i,r))) * (y(i+1,r)-y(i,r))/x_differences(i);
         end
     end
     
@@ -142,7 +147,9 @@ while r < reps+0.5
     %beta_hat = delta_x_sum_betas/N;
     %beta_hat = inverse_delta_y_sum_betas/N;
     %beta_hat = length_sum_betas/N;
-    beta_hat = inverse_length_sum_betas/N;
+    %beta_hat = inverse_length_sum_betas/N;
+
+    beta_hat = inverse_abs_delta_y_sum_betas/N;    
     
     b_hat_all(1,r)        = beta_hat;
 

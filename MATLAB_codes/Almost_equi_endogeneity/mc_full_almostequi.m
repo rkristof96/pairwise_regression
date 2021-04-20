@@ -140,7 +140,10 @@ while r < reps+0.5
     inverse_delta_y_sum_betas = 0;
     length_sum_betas = 0;
     inverse_length_sum_betas = 0;
+    total_deviation = 0;
     N = 0;
+    
+    inverse_abs_delta_y_sum_betas = 0;
     
     for i=(1:1:number_of_pairs)
         absolute_deviation = abs(delta_x(i)-d_1);
@@ -150,8 +153,11 @@ while r < reps+0.5
             inverse_delta_y_sum_betas = inverse_delta_y_sum_betas + 1/delta_x(i);
             length = sqrt(delta_x(i)^2 + delta_y(i)^2);
             length_sum_betas = length_sum_betas + length * delta_y(i)/delta_x(i);
-            inverse_length_sum_betas = inverse_length_sum_betas + (1/length) * delta_y(i)/delta_x(i);     
+            inverse_length_sum_betas = inverse_length_sum_betas + (1/length) * delta_y(i)/delta_x(i);
+            total_deviation = total_deviation + delta_x(i)-d_1;
             N = N+1;
+            
+            inverse_abs_delta_y_sum_betas = inverse_abs_delta_y_sum_betas + (1/abs(delta_y(i))) * delta_y(i)/delta_x(i);
         end
     end
     
@@ -160,10 +166,14 @@ while r < reps+0.5
     %beta_hat = delta_x_sum_betas/N;
     %beta_hat = inverse_delta_y_sum_betas/N;
     %beta_hat = length_sum_betas/N;
-    beta_hat = inverse_length_sum_betas/N;
+    %beta_hat = inverse_length_sum_betas/N;
+    
+    beta_hat = inverse_abs_delta_y_sum_betas/N;
+    
+    %beta_hat_corrected = ((1+ total_deviation/(d_1*N))^(-1))*beta_hat;
     
     b_hat_all(1,r)        = beta_hat;
-    
+ 
     r = r + 1;
 end
 
