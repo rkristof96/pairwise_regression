@@ -5,7 +5,7 @@ clc;
 % true parameters
 
 alpha = 1;
-beta  = 1.5;
+beta  = 0.5;
 epsilon = 0.01;
 sigma = 0.5;
 
@@ -20,57 +20,62 @@ reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rand('seed',202101);
-% generate x: (Tx1) u: (Txreps) vector of bi-variate normal distributed
+% generate x: (Txreps) u: (Txreps) vector of bi-variate normal distributed
 % random variables
 
-mu = zeros(1,reps+1);
-cov_matrix = zeros(reps+1);
-cov_matrix(:,:) = 0.65;
+x = zeros(T,reps);
+eps = zeros(T,reps);
 
-cov_matrix(1,:) = sigma;
-cov_matrix(:,1) = sigma;
+mu = zeros(1,2);
+cov_matrix = zeros(2);
 
-for i=(1:1:reps+1)
-    cov_matrix(i,i) = 1;
-end
+cov_matrix(1,1) = 1;
+cov_matrix(1,2) = sigma;
+cov_matrix(2,1) = sigma;
+cov_matrix(2,2) = 1;
 
 rng('default')  % For reproducibility
+for i=(1:1:reps)
+    R = mvnrnd(mu,cov_matrix,T);
+    x(:,i) = R(:,1);
+    eps(:,i) = R(:,2);
+end
 
-R = mvnrnd(mu,cov_matrix,T);
-
-x = R(:,1);
-eps = R(:,2:end);
-
-% dependent variables, in each of the repetitions
-
-y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
+% generate the dependent variable
+y = alpha+beta*x+eps;
 
 % sort
-xy = [x y];
+x_sorted = zeros(T,reps);
+y_sorted = zeros(T,reps);
 
-xy = sortrows(xy,1);
+for i=(1:1:reps)
+    x_to_sort = x(:,i);
+    y_to_sort = y(:,i);
+    xy = [x_to_sort y_to_sort];
+    xy = sortrows(xy,1);
+    x_sorted(:,i) = xy(:,1);
+    y_sorted(:,i) = xy(:,2);
+end
 
-x = xy(:,1);
-y = xy(:,2:reps+1);
+%x = x_sorted;
+%y = y_sorted;
 
 %%%%%%%%%%%%%%
 % OLS ESTIMATION %
 %%%%%%%%%%%%%%
 
-x_matr = [ones(T,1) x];  % this is matrix X in betahat = (X'X)^(-1)*(X'y)
-var_true = (sigma^2)*inv(x_matr'*x_matr);  % true variance-covariance matrix
-
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 
 r = 1;
 while r < reps+0.5
-    x_avg     = mean(x);
+    x_mc = x(:,r);
+    x_avg     = mean(x_mc);
     y_avg     = mean(y);
     y_avg_r   = y_avg(r);
     numerator = 0;
     denominator = 0;
     for i=(1:1:T)
-        x_dev = x(i,1)-x_avg;
+        x_dev = x_mc(i,1)-x_avg;
         y_dev = y(i,r)-y_avg_r;
         numerator = numerator + x_dev*y_dev;
         denominator = denominator + x_dev*x_dev;
@@ -94,8 +99,6 @@ fprintf('\nTrue parameters\n');
 fprintf('Alpha:%8.4f',b_true(1));
 fprintf('  Beta:%8.4f',b_true(2));
 fprintf('  Sigma:%8.4f\n',b_true(3));
-fprintf('Se(a):%8.4f',var_true(1,1)^0.5);
-fprintf('  Se(b):%7.4f\n',var_true(2,2)^0.5);
 % print your results: means across Monte-Carlo repetitions
 fprintf('\n');
 fprintf('OLS Estimation\n');
@@ -125,57 +128,36 @@ while r < reps+0.5
         for j=(2:1:T)
             if i<j
                 % calculate x difference
-                delta_x(1, counter) = x(j,1) - x(i,1);
+                delta_x(1, counter) = x(j,r) - x(i,r);
                 delta_y(1, counter) = y(j,r) - y(i,r);
                 counter = counter + 1;
             end
         end
     end
     
-    % Calculate d_1
+    % Calculate d
     
-    d_1 = median(delta_x);
-    sum_betas = 0;
-    delta_x_sum_betas = 0;
-    inverse_delta_y_sum_betas = 0;
-    length_sum_betas = 0;
-    inverse_length_sum_betas = 0;
+    d = median(delta_x(:,r));
     total_deviation = 0;
+
+    
+    sum_delta_y = 0;
     N = 0;
-    
-    inverse_abs_delta_y_sum_betas = 0;
-    inverse_abs_delta_y_sum = 0;
-    
     for i=(1:1:number_of_pairs)
-        absolute_deviation = abs(delta_x(i)-d_1);
+        absolute_deviation = abs(delta_x(1, i)-d);
         if absolute_deviation<epsilon
-            sum_betas = sum_betas + delta_y(i)/delta_x(i);
-            delta_x_sum_betas = delta_x_sum_betas + delta_y(i);
-            inverse_delta_y_sum_betas = inverse_delta_y_sum_betas + 1/delta_x(i);
-            length = sqrt(delta_x(i)^2 + delta_y(i)^2);
-            length_sum_betas = length_sum_betas + length * delta_y(i)/delta_x(i);
-            inverse_length_sum_betas = inverse_length_sum_betas + (1/length) * delta_y(i)/delta_x(i);
-            total_deviation = total_deviation + delta_x(i)-d_1;
+            total_deviation = total_deviation + delta_x(1,i)-d;
+            sum_delta_y = sum_delta_y + delta_y(1, i);
             N = N+1;
-            
-            inverse_abs_delta_y_sum_betas = inverse_abs_delta_y_sum_betas + (1/abs(delta_y(i))) * delta_y(i)/delta_x(i);
-            inverse_abs_delta_y_sum = inverse_abs_delta_y_sum + 1/abs(delta_y(i));
         end
     end
     
     %estimate beta
-    %beta_hat = sum_betas/(N);
-    %beta_hat = delta_x_sum_betas/N;
-    %beta_hat = inverse_delta_y_sum_betas/N;
-    %beta_hat = length_sum_betas/N;
-    %beta_hat = inverse_length_sum_betas/N;
+    beta_hat = sum_delta_y/(N*d);
+    beta_hat_corrected = ((1+ total_deviation/(d*N))^(-1))*beta_hat;
     
-    beta_hat = inverse_abs_delta_y_sum_betas/N;
+    b_hat_all(1,r)        = beta_hat_corrected;
     
-    %beta_hat_corrected = ((1+ total_deviation/(d_1*N))^(-1))*beta_hat;
-    
-    b_hat_all(1,r)        = beta_hat;
- 
     r = r + 1;
 end
 

@@ -128,10 +128,10 @@ while r < reps+0.5
 
     % Obtain the delta-y weighted average of pairwise betas
     
-    %abs_delta_y = abs(delta_y);
-    abs_delta_y = delta_y;
-    weighting_delta_y = abs_delta_y;
-    %weighting_delta_y = 1./ abs_delta_y;
+    abs_delta_y = abs(delta_y);
+    %abs_delta_y = delta_y;
+    %weighting_delta_y = abs_delta_y;
+    weighting_delta_y = 1./ abs_delta_y;
     sum_delta_y = sum(weighting_delta_y);
     weighted_parwise_betas = pairwise_betas*weighting_delta_y';
     weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_y;

@@ -46,7 +46,7 @@ y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 % sort
 x_y_eps = [x y eps];
 
-%x_y_eps = sortrows(x_y_eps,1);
+x_y_eps = sortrows(x_y_eps,1);
 
 x = x_y_eps(:,1);
 y = x_y_eps(:,2:reps+1);
@@ -107,7 +107,7 @@ fprintf('  Beta:%8.4f',standard_dev2);
 
 
 %%%%%%%%%%%%%%
-% NON-SORTED PAIRWISE ESTIMATION %
+% PAIRWISE ESTIMATION %
 %%%%%%%%%%%%%%
 
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
@@ -116,12 +116,15 @@ r = 1;
 while r < reps+0.5
     number_of_betas = T * (T-1) /2;
     pairwise_betas=zeros(2,number_of_betas);
+    delta_y = zeros(1,number_of_betas);
     counter=1;
 
     % iterate over all pairs
     for i=(1:1:T-1)
         for j=(2:1:T)
             if i<j
+                % calculate y difference
+                delta_y(1, counter) = y(j,r) - y(i,r);
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
                 y_avg     = (y(i,r)+y(j,r))/2;          
@@ -136,10 +139,21 @@ while r < reps+0.5
         end;
     end;
 
+    abs_delta_y = abs(delta_y);
+    weighting_delta_y = 1./ abs_delta_y;
+    sum_delta_y = sum(weighting_delta_y);
+    weighted_parwise_betas = pairwise_betas*weighting_delta_y';
+    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_y;
+   
+    
     average_parwise_betas = mean(pairwise_betas,2);
-    b_hat_all(1,r)        = average_parwise_betas(1,:);
-    b_hat_all(2,r)        = average_parwise_betas(2,:);
+    
+    %b_hat_all(1,r)        = average_parwise_betas(1,:);
+    %b_hat_all(2,r)        = average_parwise_betas(2,:);
 
+    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
+    b_hat_all(2,r)        = weighted_average_parwise_betas(2);
+    
     r = r + 1;
 end
 
