@@ -14,7 +14,7 @@ sigma = 0.5;
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -115,11 +115,12 @@ b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th 
 % Calculate d_1
 
 x_differences = diff(x);
-d_1 = median(x_differences);
+abs_x_differences = abs(x_differences);
+d_1 = median(abs_x_differences);
 number_to_keep = 0;
 
 for i=(1:1:T-1)
-    absolute_deviation = abs(x_differences(i)-d_1);
+    absolute_deviation = abs(abs_x_differences(i)-d_1);
     if absolute_deviation<epsilon
         number_to_keep = number_to_keep + 1;
     end
@@ -131,16 +132,18 @@ while r < reps+0.5
     pairwise_betas=zeros(1,number_to_keep);
     delta_x = zeros(1,number_to_keep);
     inverse_delta_y = zeros(1,number_to_keep);
+    inverse_abs_delta_y = zeros(1,number_to_keep);
     length = zeros(1,number_to_keep);
     inverse_length = zeros(1,number_to_keep);
     counter = 1;
     
     for i=(1:1:T-1)
-        absolute_deviation = abs(x_differences(i)-d_1);
+        absolute_deviation = abs(abs_x_differences(i)-d_1);
         if absolute_deviation<epsilon
            pairwise_betas(1,counter) = (y(i+1,r)-y(i,r))/x_differences(i);
            delta_x(1,counter) = x_differences(i);
            inverse_delta_y(1,counter) = 1/(y(i+1,r)-y(i,r));
+           inverse_abs_delta_y(1, counter) = 1/abs(y(i+1,r)-y(i,r));
            length(1,counter) = sqrt(x_differences(i)^2 + (y(i+1,r)-y(i,r))^2);
            inverse_length(1,counter) = 1/(sqrt(x_differences(i)^2 + (y(i+1,r)-y(i,r))^2));
            counter = counter + 1;
@@ -149,6 +152,7 @@ while r < reps+0.5
     
     %assigned_weight = delta_x;
     %assigned_weight = inverse_delta_y;
+    %assigned_weight = inverse_abs_delta_y;
     %assigned_weight = length;
     assigned_weight = inverse_length;
         
@@ -179,3 +183,5 @@ fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev2);
 fprintf('\n  Number of observations we keep:%8.4f',number_to_keep);
+fprintf('\n  The d we set:%8.4f',d_1);
+

@@ -129,12 +129,14 @@ for i=(1:1:T-1)
     end
 end 
 
-d_1 = median(delta_x);
+% Calculate d_1
 
+abs_x_differences = abs(delta_x);
+d_1 = median(abs_x_differences);
 number_to_keep = 0;
 
 for i=(1:1:number_of_pairs)
-    absolute_deviation = abs(delta_x(i)-d_1);
+    absolute_deviation = abs(abs_x_differences(i)-d_1);
     if absolute_deviation<epsilon
         number_to_keep = number_to_keep + 1;
     end
@@ -159,17 +161,19 @@ while r < reps+0.5
     pairwise_betas=zeros(1,number_to_keep);
     delta_x_weight = zeros(1,number_to_keep);
     inverse_delta_y = zeros(1,number_to_keep);
+    inverse_abs_delta_y = zeros(1,number_to_keep);    
     length = zeros(1,number_to_keep);
     inverse_length = zeros(1,number_to_keep);
     counter = 1;
     
     % iterate over all pairs
     for i=(1:1:number_of_pairs)
-        absolute_deviation = abs(delta_x(i)-d_1);
+        absolute_deviation = abs(abs_x_differences(i)-d_1);
         if absolute_deviation<epsilon
            pairwise_betas(1,counter) = delta_y(i)/delta_x(i);
            delta_x_weight(1,counter) = delta_x(i);
            inverse_delta_y(1,counter) = 1/delta_y(i);
+           inverse_abs_delta_y(1, counter) = 1/abs(delta_y(i));
            length(1,counter) = sqrt(delta_x(i)^2 + delta_y(i)^2);
            inverse_length(1,counter) = 1/(sqrt(delta_x(i)^2 + delta_y(i)^2));
            counter = counter + 1;
@@ -178,6 +182,7 @@ while r < reps+0.5
     
     %assigned_weight = delta_x_weight;
     %assigned_weight = inverse_delta_y;
+    %assigned_weight = inverse_abs_delta_y;
     %assigned_weight = length;
     assigned_weight = inverse_length;
         
@@ -208,4 +213,6 @@ fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev2);
 fprintf('\n  Number of observations we keep:%8.4f',number_to_keep);
+fprintf('\n  The d we set:%8.4f',d_1);
+
 

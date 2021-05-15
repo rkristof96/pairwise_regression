@@ -114,7 +114,8 @@ b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th 
 % Calculate d_1
 
 x_differences = diff(x);
-d_1 = median(x_differences);
+abs_x_differences = abs(x_differences);
+d_1 = median(abs_x_differences);
 
 r = 1;
 while r < reps+0.5 
@@ -126,9 +127,10 @@ while r < reps+0.5
     N = 0;
 
     inverse_abs_delta_y_sum_betas = 0;
+    abs_delta_x_sum_betas = 0;
 
     for i=(1:1:T-1)
-        absolute_deviation = abs(x_differences(i)-d_1);
+        absolute_deviation = abs(abs_x_differences(i)-d_1);
         if absolute_deviation<epsilon
             sum_betas = sum_betas + (y(i+1,r)-y(i,r))/x_differences(i);
             delta_x_sum_betas = delta_x_sum_betas + (y(i+1,r)-y(i,r));
@@ -139,6 +141,7 @@ while r < reps+0.5
             N = N+1;
             
             inverse_abs_delta_y_sum_betas = inverse_abs_delta_y_sum_betas + (1/abs(y(i+1,r)-y(i,r))) * (y(i+1,r)-y(i,r))/x_differences(i);
+            abs_delta_x_sum_betas = abs_delta_x_sum_betas + abs(x_differences(i))*(y(i+1,r)-y(i,r))/x_differences(i);
         end
     end
     
@@ -149,7 +152,8 @@ while r < reps+0.5
     %beta_hat = length_sum_betas/N;
     %beta_hat = inverse_length_sum_betas/N;
 
-    beta_hat = inverse_abs_delta_y_sum_betas/N;    
+    %beta_hat = inverse_abs_delta_y_sum_betas/N;
+    beta_hat = abs_delta_x_sum_betas/N;
     
     b_hat_all(1,r)        = beta_hat;
 
@@ -169,4 +173,6 @@ fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev1);
 fprintf('\n  Number of observations we keep:%8.4f',N);
+fprintf('\n  The d we set:%8.4f',d_1);
+
 
