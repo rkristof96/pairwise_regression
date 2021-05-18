@@ -11,7 +11,7 @@ sigma = 0.5;
 
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 %%%%%%%%%%%%%%%%%%%
@@ -48,7 +48,7 @@ y = alpha+beta*x+eps;
 % sort
 xy = [x y];
 
-xy = sortrows(xy,1);
+%xy = sortrows(xy,1);
 
 x = xy(:,1);
 y = xy(:,2:reps+1);
@@ -127,22 +127,47 @@ while r < reps+0.5
     
     % Calculate d
     
-    d = median(delta_x);
+    abs_x_differences = abs(delta_x);
+    d = median(abs_x_differences);
     total_deviation = 0;
 
-    sum_delta_y = 0;
+    sum_betas = 0;
+    delta_x_sum_betas = 0;
+    inverse_delta_y_sum_betas = 0;
+    length_sum_betas = 0;
+    inverse_length_sum_betas = 0;
     N = 0;
+
+    inverse_abs_delta_y_sum_betas = 0;
+    abs_delta_x_sum_betas = 0;
+
     for i=(1:1:number_of_pairs)
-        absolute_deviation = abs(delta_x(1, i)-d);
+        absolute_deviation = abs(abs_x_differences(i)-d);
         if absolute_deviation<epsilon
-            total_deviation = total_deviation + delta_x(1,i)-d;
-            sum_delta_y = sum_delta_y + delta_y(1, i);
+            total_deviation = total_deviation + abs_x_differences(i)-d;
+
+            sum_betas = sum_betas + delta_y(i)/delta_x(i);
+            delta_x_sum_betas = delta_x_sum_betas + delta_y(i);
+            inverse_delta_y_sum_betas = inverse_delta_y_sum_betas + 1/delta_x(i);
+            length = sqrt(delta_x(i)^2 + delta_y(i)^2);
+            length_sum_betas = length_sum_betas + length * delta_y(i)/delta_x(i);
+            inverse_length_sum_betas = inverse_length_sum_betas + (1/length) * delta_y(i)/delta_x(i);     
+            
+            inverse_abs_delta_y_sum_betas = inverse_abs_delta_y_sum_betas + (1/abs(delta_y(i))) * delta_y(i)/delta_x(i);
+            abs_delta_x_sum_betas = abs_delta_x_sum_betas + abs(delta_x(i))*delta_y(i)/delta_x(i);
             N = N+1;
         end
     end
     
     %estimate beta
-    beta_hat = sum_delta_y/(N*d);
+    %beta_hat = sum_betas/(N);
+    %beta_hat = delta_x_sum_betas/N;
+    %beta_hat = inverse_delta_y_sum_betas/N;
+    beta_hat = length_sum_betas/N;
+    %beta_hat = inverse_length_sum_betas/N;
+
+    %beta_hat = inverse_abs_delta_y_sum_betas/N;
+    %beta_hat = abs_delta_x_sum_betas/N;
 
     %estimate gamma
     selected_delta_y = zeros(N,1);
@@ -150,7 +175,7 @@ while r < reps+0.5
     M = 1;
     
     for i=(1:1:number_of_pairs)
-        absolute_deviation = abs(delta_x(1, i)-d);
+        absolute_deviation = abs(abs_x_differences(i)-d);
         if absolute_deviation<epsilon
             selected_delta_y(M,1) = delta_y(1,i);
             selected_delta_x(M,1) = delta_x(1,i);
@@ -197,3 +222,4 @@ fprintf('Beta:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('\n Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev1);
 fprintf('\n  Number of observations we keep:%8.4f',N);
+fprintf('\n  The d we set:%8.4f',d);
