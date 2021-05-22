@@ -9,7 +9,7 @@ global pairwise_beta1;
 
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 epsilon = 0.01;
 sigma = 0.5;
 

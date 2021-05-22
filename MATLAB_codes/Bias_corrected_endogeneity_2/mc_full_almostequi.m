@@ -5,13 +5,13 @@ clc;
 % true parameters
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 epsilon = 0.01;
 sigma = 0.5;
 
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 %%%%%%%%%%%%%%%%%%%
@@ -160,11 +160,11 @@ while r < reps+0.5
     end
     
     %estimate beta
-    beta_hat = sum_betas/(N);
+    %beta_hat = sum_betas/(N);
     %beta_hat = delta_x_sum_betas/N;
     %beta_hat = inverse_delta_y_sum_betas/N;
     %beta_hat = length_sum_betas/N;
-    %beta_hat = inverse_length_sum_betas/N;
+    beta_hat = inverse_length_sum_betas/N;
 
     %beta_hat = inverse_abs_delta_y_sum_betas/N;
     %beta_hat = abs_delta_x_sum_betas/N;
