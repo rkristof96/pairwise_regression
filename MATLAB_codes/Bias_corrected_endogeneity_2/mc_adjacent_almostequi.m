@@ -115,19 +115,44 @@ r = 1;
 while r < reps+0.5 
     total_deviation = 0;
     
-    sum_delta_y = 0;
+    sum_betas = 0;
+    delta_x_sum_betas = 0;
+    inverse_delta_y_sum_betas = 0;
+    length_sum_betas = 0;
+    inverse_length_sum_betas = 0;
     N = 0;
+
+    inverse_abs_delta_y_sum_betas = 0;
+    abs_delta_x_sum_betas = 0;
+    
     for i=(1:1:T-1)
         absolute_deviation = abs(abs_x_differences(i)-d);
         if absolute_deviation<epsilon
-            total_deviation = total_deviation + x_differences(i)-d;
-            sum_delta_y = sum_delta_y + y(i+1,r)-y(i,r);
+            total_deviation = total_deviation + abs_x_differences(i)-d;
+
+            sum_betas = sum_betas + (y(i+1,r)-y(i,r))/x_differences(i);
+            delta_x_sum_betas = delta_x_sum_betas + (y(i+1,r)-y(i,r));
+            inverse_delta_y_sum_betas = inverse_delta_y_sum_betas + 1/x_differences(i);
+            length = sqrt(x_differences(i)^2 + (y(i+1,r)-y(i,r))^2);
+            length_sum_betas = length_sum_betas + length * (y(i+1,r)-y(i,r))/x_differences(i);
+            inverse_length_sum_betas = inverse_length_sum_betas + (1/length) * (y(i+1,r)-y(i,r))/x_differences(i);     
             N = N+1;
+            
+            inverse_abs_delta_y_sum_betas = inverse_abs_delta_y_sum_betas + (1/abs(y(i+1,r)-y(i,r))) * (y(i+1,r)-y(i,r))/x_differences(i);
+            abs_delta_x_sum_betas = abs_delta_x_sum_betas + abs(x_differences(i))*(y(i+1,r)-y(i,r))/x_differences(i);
         end
     end
     
     %estimate beta
-    beta_hat = sum_delta_y/(N*d);
+    %beta_hat = sum_betas/(N);
+    %beta_hat = delta_x_sum_betas/N;
+    %beta_hat = inverse_delta_y_sum_betas/N;
+    %beta_hat = length_sum_betas/N;
+    beta_hat = inverse_length_sum_betas/N;
+
+    %beta_hat = inverse_abs_delta_y_sum_betas/N;
+    %beta_hat = abs_delta_x_sum_betas/N;
+   
     
     %estimate gamma
     selected_delta_y = zeros(N,1);
@@ -163,6 +188,7 @@ while r < reps+0.5
     %estimate beta_tilde
     
     beta_tilde = (beta_hat-gamma_hat)*d/mu_hat;
+   
     
     b_hat_all(1,r)        = beta_tilde;
 
@@ -183,5 +209,3 @@ fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetit
 fprintf('  Beta:%8.4f',standard_dev1);
 fprintf('\n  Number of observations we keep:%8.4f',N);
 fprintf('\n  The d we set:%8.4f',d);
-
-

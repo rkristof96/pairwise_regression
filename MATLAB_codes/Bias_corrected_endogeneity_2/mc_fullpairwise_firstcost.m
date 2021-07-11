@@ -9,13 +9,13 @@ global pairwise_beta1;
 
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 epsilon = 0.01;
 sigma = 0.5;
 
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -49,7 +49,7 @@ y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 % sort
 xy = [x y];
 
-xy = sortrows(xy,1);
+%xy = sortrows(xy,1);
 
 x = xy(:,1);
 y = xy(:,2:reps+1);
@@ -127,16 +127,17 @@ for i=(1:1:T-1)
     end
 end 
 
-d = median(delta_x);
+abs_x_differences = abs(delta_x);
+d = median(abs_x_differences);
 
 number_to_keep = 0;
 total_deviation = 0;
 
 for i=(1:1:number_of_pairs)
-    absolute_deviation = abs(delta_x(i)-d);
+    absolute_deviation = abs(abs_x_differences(i)-d);
     if absolute_deviation<epsilon
         number_to_keep = number_to_keep + 1;
-        total_deviation = total_deviation + delta_x(1,i)-d;
+        total_deviation = total_deviation + abs_x_differences(i)-d;
     end
 end
 
@@ -163,7 +164,7 @@ while r < reps+0.5
     
     % iterate over all pairs
     for i=(1:1:number_of_pairs)
-        absolute_deviation = abs(delta_x(i)-d);
+        absolute_deviation = abs(abs_x_differences(i)-d);
         if absolute_deviation<epsilon
            pairwise_betas(1,counter) = delta_y(i)/delta_x(i);
            delta_x_weight(1,counter) = delta_x(i);
@@ -175,9 +176,9 @@ while r < reps+0.5
     end
     
     %assigned_weight = delta_x_weight;
-    assigned_weight = inverse_delta_y;
+    %assigned_weight = inverse_delta_y;
     %assigned_weight = length;
-    %assigned_weight = inverse_length;
+    assigned_weight = inverse_length;
         
     pairwise_beta1 = pairwise_betas(1, :);
     
@@ -194,7 +195,7 @@ while r < reps+0.5
     M = 1;
     
     for i=(1:1:number_of_pairs)
-        absolute_deviation = abs(delta_x(i)-d);
+        absolute_deviation = abs(abs_x_differences(i)-d);
         if absolute_deviation<epsilon
             selected_delta_y(M,1) = delta_y(i);
             selected_delta_x(M,1) = delta_x(i);
@@ -242,4 +243,4 @@ fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev2);
 fprintf('\n  Number of observations we keep:%8.4f',number_to_keep);
-
+fprintf('\n  The d we set:%8.4f',d);
