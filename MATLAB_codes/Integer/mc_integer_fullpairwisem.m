@@ -5,11 +5,11 @@ clc;
 % true parameters
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 sigma = sqrt(0.5);
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -29,11 +29,12 @@ x_standard = (x-x_mean)/(x_std*sqrt(2));
 eps_endog = eps + 10 * x_standard;
 
 % Make epsilon endogenous
-eps = eps_endog;
+%eps = eps_endog;
 
 % random shuffle
 x_and_eps = [x eps];
 
+randn('seed',202102);
 random_x_and_eps = x_and_eps(randperm(size(x_and_eps, 1)), :);
 
 x = random_x_and_eps(:,1);
@@ -46,7 +47,7 @@ y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 % sort
 x_y_eps = [x y eps];
 
-x_y_eps = sortrows(x_y_eps,1);
+%x_y_eps = sortrows(x_y_eps,1);
 
 x = x_y_eps(:,1);
 y = x_y_eps(:,2:reps+1);
@@ -117,6 +118,7 @@ while r < reps+0.5
     number_of_betas = T * (T-1) /2;
     pairwise_betas=zeros(2,number_of_betas);
     delta_y = zeros(1,number_of_betas);
+    delta_x = zeros(1,number_of_betas);
     counter=1;
 
     % iterate over all pairs
@@ -125,6 +127,7 @@ while r < reps+0.5
             if i<j
                 % calculate y difference
                 delta_y(1, counter) = y(j,r) - y(i,r);
+                delta_x(1, counter) = x(j,1) - x(i,1);                
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
                 y_avg     = (y(i,r)+y(j,r))/2;          
@@ -139,11 +142,11 @@ while r < reps+0.5
         end;
     end;
 
-    abs_delta_y = abs(delta_y);
-    weighting_delta_y = 1./ abs_delta_y;
-    sum_delta_y = sum(weighting_delta_y);
-    weighted_parwise_betas = pairwise_betas*weighting_delta_y';
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_y;
+    %delta_x = abs(delta_x);
+    weighting_delta_x = delta_x;
+    sum_delta_x = sum(weighting_delta_x);
+    weighted_parwise_betas = pairwise_betas*weighting_delta_x';
+    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_x;
    
     
     average_parwise_betas = mean(pairwise_betas,2);

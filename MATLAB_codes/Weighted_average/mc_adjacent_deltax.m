@@ -6,13 +6,13 @@ clc;
 
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 sigma = 1;
 xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -35,10 +35,10 @@ randn('seed',202101);
 eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
 
-%Z_eps = normrnd(0,1, [T,reps]);
-%tau_eps = abs(Z_eps);
-%rand('seed',222022);
-%U_eps = normrnd(0,1, [T,reps]);
+Z_eps = normrnd(0,1, [T,reps]);
+tau_eps = abs(Z_eps);
+rand('seed',222022);
+U_eps = normrnd(0,1, [T,reps]);
 %eps = xi + tau_eps + U_eps;
     
 % dependent variables, in each of the repetitions
@@ -131,10 +131,17 @@ while r < reps+0.5
     % Obtain the delta-x weighted average of pairwise betas
     
     delta_x = diff(x);
-    %delta_x = abs(delta_x);
+    delta_x = abs(delta_x);
     sum_delta_x = sum(delta_x);
     weighted_parwise_betas = pairwise_betas*delta_x;
     weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_x;
+    %weighted_average_parwise_betas = weighted_parwise_betas./(T-1);
+    
+    %inv_delta_x = 1./delta_x;
+    %sum_inv_delta_x = sum(inv_delta_x);
+    %weighted_parwise_betas = pairwise_betas*inv_delta_x;
+    %weighted_average_parwise_betas = weighted_parwise_betas./sum_inv_delta_x;
+    %weighted_average_parwise_betas = weighted_parwise_betas./(T-1);
     
     b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);

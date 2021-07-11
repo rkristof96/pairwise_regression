@@ -37,7 +37,7 @@ y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 % sort
 xy = [x y];
 
-xy = sortrows(xy,1);
+%xy = sortrows(xy,1);
 
 x = xy(:,1);
 y = xy(:,2:reps+1);

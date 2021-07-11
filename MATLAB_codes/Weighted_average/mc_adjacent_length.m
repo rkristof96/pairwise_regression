@@ -4,27 +4,43 @@ clc;
 
 % true parameters
 
+
 alpha = 1;
 beta  = 0.5;
 sigma = 1;
+xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
-x = rand(T,1)*2-1;
+%x = rand(T,1)*2-1;
+x = rand(T,1)*20-10;
+%x = normrnd(0,5, [T,1]);
+
+%Z = normrnd(0,1, [T,1]);
+%tau = abs(Z);
+%rand('seed',202020);
+%U = normrnd(0,1, [T,1]);
+%x = xi + tau + U;
 
 % error terms
 
 randn('seed',202101);
-eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
+%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
 
+Z_eps = normrnd(0,1, [T,reps]);
+tau_eps = abs(Z_eps);
+rand('seed',222022);
+U_eps = normrnd(0,1, [T,reps]);
+eps = xi + tau_eps + U_eps;
+    
 % dependent variables, in each of the repetitions
 
 y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
@@ -92,7 +108,7 @@ fprintf('  Beta:%8.4f',standard_dev2);
 
 
 %%%%%%%%%%%%%%
-% Adjacent PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %
+% ADJACENT PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %
 %%%%%%%%%%%%%%
 
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
@@ -112,18 +128,14 @@ while r < reps+0.5
         pairwise_betas(1,i)=alpha_hat;
         pairwise_betas(2,i)=b_hat;
     end
+    % Obtain the length weighted average of pairwise betas
     
-    % Obtain the (abs) delta_y weighted average of pairwise betas
-    
-    current_y = y(:,r);
-    delta_y = diff(current_y);
-    %abs_delta_y = abs(delta_y);
-    abs_delta_y = delta_y;
-    weighting_delta_y = abs_delta_y;
-    %weighting_delta_y = 1./ abs_delta_y;
-    sum_delta_y = sum(weighting_delta_y);
-    weighted_parwise_betas = pairwise_betas*weighting_delta_y;
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_y;
+    length = sqrt(diff(x).^2 + diff(y(:,r).^2));
+    inv_length = 1./length;
+    sum_length = sum(length);
+    sum_inv_length = sum(inv_length);
+    weighted_parwise_betas = pairwise_betas*length;
+    weighted_average_parwise_betas = weighted_parwise_betas./sum_length;
     %weighted_average_parwise_betas = weighted_parwise_betas./(T-1);
     
     b_hat_all(1,r)        = weighted_average_parwise_betas(1);

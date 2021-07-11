@@ -135,6 +135,7 @@ while r < reps+0.5
     sum_delta_y = sum(weighting_delta_y);
     weighted_parwise_betas = pairwise_betas*weighting_delta_y';
     weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_y;
+    %weighted_average_parwise_betas = weighted_parwise_betas./number_of_betas;
     
     b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);

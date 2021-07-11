@@ -105,16 +105,20 @@ fprintf('  Beta:%8.4f',standard_dev2);
 %%%%%%%%%%%%%%
 b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
 
+% Calculate d_1
+
+x_differences = diff(x);
+abs_x_differences = abs(x_differences);
+d = median(abs_x_differences);
+
 r = 1;
 while r < reps+0.5 
-    x_differences = diff(x(:,1));
-    d = median(x_differences);
     total_deviation = 0;
     
     sum_delta_y = 0;
     N = 0;
     for i=(1:1:T-1)
-        absolute_deviation = abs(x_differences(i)-d);
+        absolute_deviation = abs(abs_x_differences(i)-d);
         if absolute_deviation<epsilon
             total_deviation = total_deviation + x_differences(i)-d;
             sum_delta_y = sum_delta_y + y(i+1,r)-y(i,r);
@@ -131,7 +135,7 @@ while r < reps+0.5
     M = 1;
     
     for i=(1:1:T-1)
-        absolute_deviation = abs(x_differences(i)-d);
+        absolute_deviation = abs(abs_x_differences(i)-d);
         if absolute_deviation<epsilon
             selected_delta_y(M,1) = y(i+1,r)-y(i,r);
             selected_delta_x(M,1) = x_differences(i);
@@ -178,4 +182,6 @@ fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('  Beta:%8.4f',standard_dev1);
 fprintf('\n  Number of observations we keep:%8.4f',N);
+fprintf('\n  The d we set:%8.4f',d);
+
 

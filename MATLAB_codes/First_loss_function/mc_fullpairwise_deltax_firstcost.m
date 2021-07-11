@@ -16,7 +16,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -24,14 +24,14 @@ rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
 %x = rand(T,1)*2-1;
-%x = rand(T,1)*20-10;
+x = rand(T,1)*20-10;
 %x = normrnd(0,5, [T,1]);
 
-Z = normrnd(0,1, [T,1]);
-tau = abs(Z);
-rand('seed',202020);
-U = normrnd(0,1, [T,1]);
-x = xi + tau + U;
+%Z = normrnd(0,1, [T,1]);
+%tau = abs(Z);
+%rand('seed',202020);
+%U = normrnd(0,1, [T,1]);
+%x = xi + tau + U;
 
 % error terms
 
@@ -52,7 +52,7 @@ y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 % sort
 xy = [x y];
 
-xy = sortrows(xy,1);
+%xy = sortrows(xy,1);
 
 x = xy(:,1);
 y = xy(:,2:reps+1);
@@ -145,7 +145,9 @@ while r < reps+0.5
     end
     
     delta_x = delta_x';
+    inv_delta_x = 1 ./delta_x;
     assigned_weight = delta_x;
+    assigned_weight = inv_delta_x;
     
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);

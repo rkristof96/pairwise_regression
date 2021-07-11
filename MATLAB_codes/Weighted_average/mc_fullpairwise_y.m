@@ -11,7 +11,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -134,6 +134,7 @@ while r < reps+0.5
     sum_y = sum(weighting_y);
     weighted_parwise_betas = pairwise_betas*weighting_y';
     weighted_average_parwise_betas = weighted_parwise_betas./sum_y;
+    weighted_average_parwise_betas = weighted_parwise_betas./number_of_betas;
     
     b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
