@@ -125,7 +125,7 @@ while r < reps+0.5
         numerator = y(i+1,r) - y(i,r);
         denominator = x(i+1,1) - x(i,1);
         b_hat     = numerator/denominator;
-        alpha_hat = mean(y(i:i+1,r)) - b_hat*mean(x(i:i+1));
+        alpha_hat = y_avg - b_hat*x_avg;
         pairwise_betas(1,i)=alpha_hat;
         pairwise_betas(2,i)=b_hat;
     end

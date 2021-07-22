@@ -12,7 +12,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -124,7 +124,7 @@ while r < reps+0.5
         numerator = y(i+1,r) - y(i,r);
         denominator = x(i+1,1) - x(i,1);
         b_hat     = numerator/denominator;
-        alpha_hat = mean(y(i:i+1,r)) - b_hat*mean(x(i:i+1));
+        alpha_hat = y_avg - b_hat*x_avg;
         pairwise_betas(1,i)=alpha_hat;
         pairwise_betas(2,i)=b_hat;
     end
@@ -138,7 +138,11 @@ while r < reps+0.5
     weighted_average_parwise_betas = weighted_parwise_betas./sum_length;
     %weighted_average_parwise_betas = weighted_parwise_betas./(T-1);
     
-    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
+    % Simple average for beta_0
+    pairwise_betas = sum(pairwise_betas,2)./(T-1);
+    b_hat_all(1,r)        = pairwise_betas(1);
+    
+    %b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
 
     r = r + 1;   

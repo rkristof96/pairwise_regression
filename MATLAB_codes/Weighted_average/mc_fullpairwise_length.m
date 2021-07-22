@@ -6,7 +6,7 @@ clc;
 
 
 alpha = 1;
-beta  = 1.5;
+beta  = 0.5;
 sigma = 1;
 xi = -sqrt(2/pi);
 
@@ -137,7 +137,7 @@ while r < reps+0.5
                 numerator = y(j,r) - y(i,r);
                 denominator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
-                alpha_hat_i = y_avg - b_hat*y_avg;
+                alpha_hat_i = y_avg - b_hat*x_avg;
                 pairwise_betas(1,counter)=alpha_hat_i;
                 pairwise_betas(2,counter)=b_hat_i;
                 counter   = counter+1;
@@ -155,7 +155,11 @@ while r < reps+0.5
     weighted_average_parwise_betas = weighted_parwise_betas./sum_length;
     %weighted_average_parwise_betas = weighted_parwise_betas./number_of_betas;
     
-    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
+    % Simple average for beta_0
+    pairwise_betas = sum(pairwise_betas,2)./number_of_betas;
+    b_hat_all(1,r)        = pairwise_betas(1);    
+    
+    %b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
     
 

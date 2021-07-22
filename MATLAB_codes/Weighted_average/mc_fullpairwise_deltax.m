@@ -6,21 +6,21 @@ clc;
 
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 sigma = 1;
 xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
-x = rand(T,1)*2-1;
-%x = rand(T,1)*20-10;
+%x = rand(T,1)*2-1;
+x = rand(T,1)*20-10;
 %x = normrnd(0,5, [T,1]);
 
 %Z = normrnd(0,1, [T,1]);
@@ -32,14 +32,14 @@ x = rand(T,1)*2-1;
 % error terms
 
 randn('seed',202101);
-eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
+%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
 
 Z_eps = normrnd(0,1, [T,reps]);
 tau_eps = abs(Z_eps);
 rand('seed',222022);
 U_eps = normrnd(0,1, [T,reps]);
-%eps = xi + tau_eps + U_eps;
+eps = xi + tau_eps + U_eps;
     
 % dependent variables, in each of the repetitions
 
@@ -133,7 +133,7 @@ while r < reps+0.5
                 numerator = y(j,r) - y(i,r);
                 denominator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
-                alpha_hat_i = y_avg - b_hat*y_avg;
+                alpha_hat_i = y_avg - b_hat*x_avg;
                 pairwise_betas(1,counter)=alpha_hat_i;
                 pairwise_betas(2,counter)=b_hat_i;
                 counter   = counter+1;
@@ -143,7 +143,7 @@ while r < reps+0.5
 
     % Obtain the delta-x weighted average of pairwise betas
     
-    delta_x = abs(delta_x);
+    %delta_x = abs(delta_x);
     sum_delta_x = sum(delta_x);
     weighted_parwise_betas = pairwise_betas*delta_x';
     weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_x;
@@ -155,7 +155,11 @@ while r < reps+0.5
     %weighted_average_parwise_betas = weighted_parwise_betas./sum_inv_delta_x;
     %weighted_average_parwise_betas = weighted_parwise_betas./(T-1);
     
-    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
+    % Simple average for beta_0
+    pairwise_betas = sum(pairwise_betas,2)./number_of_betas;
+    b_hat_all(1,r)        = pairwise_betas(1);    
+    
+    %b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
     
 

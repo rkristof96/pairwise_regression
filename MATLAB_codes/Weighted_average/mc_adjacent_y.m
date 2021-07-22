@@ -120,8 +120,12 @@ while r < reps+0.5
     sum_y = sum(y_weight);
     weighted_parwise_betas = pairwise_betas*y_weight;
     weighted_average_parwise_betas = weighted_parwise_betas./sum_y;
+
+    % Simple average for beta_0
+    pairwise_betas = sum(pairwise_betas,2)./number_of_betas;
+    b_hat_all(1,r)        = pairwise_betas(1);
     
-    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
+    %b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
 
     r = r + 1;   
@@ -138,72 +142,6 @@ standard_dev2=std(b_hat_all(2,:));
 
 fprintf('\n');
 fprintf('\n ADJACENT PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
-fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
-fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
-fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
-fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
-fprintf('Alpha:%8.4f',standard_dev1);
-fprintf('  Beta:%8.4f',standard_dev2);
-
-
-%%%%%%%%%%%%%%
-% FULL PAIRWISE ESTIMATION %
-%%%%%%%%%%%%%%
-
-b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
-
-r = 1;
-while r < reps+0.5
-    number_of_betas = T * (T-1) /2;
-    pairwise_betas = zeros(2,number_of_betas);
-    first_y = zeros(1,number_of_betas);
-    counter=1;
-    
-    % iterate over all pairs
-    for i=(1:1:T-1)
-        for j=(2:1:T)
-            if i<j
-                % calculate the first y
-                first_y(1, counter) = y(i,1);         
-                % calculate betahat
-                x_avg     = (x(i,1)+x(j,1))/2;
-                y_avg     = (y(i,r)+y(j,r))/2;
-                numerator = y(j,r) - y(i,r);
-                denominator = x(j,1) - x(i,1);
-                b_hat_i     = numerator/denominator;
-                alpha_hat_i = y_avg - b_hat*y_avg;
-                pairwise_betas(1,counter)=alpha_hat_i;
-                pairwise_betas(2,counter)=b_hat_i;
-                counter   = counter+1;
-            end
-        end
-    end
-
-    % Obtain the y weighted average of pairwise betas
-    
-    y_weight = first_y;
-    sum_y = sum(y_weight);
-    weighted_parwise_betas = pairwise_betas*y_weight';
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_y;
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_y;
-    
-    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
-    b_hat_all(2,r)        = weighted_average_parwise_betas(2);
-    
-
-    r = r + 1;
-end
-
-standard_dev1=std(b_hat_all(1,:));
-
-standard_dev2=std(b_hat_all(2,:));
-
-%%%%%%%%%%%%
-% PRINTING %
-%%%%%%%%%%%%
-
-fprintf('\n');
-fprintf('\n FULL PAIRWISE ESTIMATION\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
