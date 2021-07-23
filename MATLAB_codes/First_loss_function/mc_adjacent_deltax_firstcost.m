@@ -15,7 +15,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -23,26 +23,26 @@ rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
 %x = rand(T,1)*2-1;
-%x = rand(T,1)*20-10;
+x = rand(T,1)*20-10;
 %x = normrnd(0,5, [T,1]);
 
-Z = normrnd(0,1, [T,1]);
-tau = abs(Z);
-rand('seed',202020);
-U = normrnd(0,1, [T,1]);
-x = xi + tau + U;
+%Z = normrnd(0,1, [T,1]);
+%tau = abs(Z);
+%rand('seed',202020);
+%U = normrnd(0,1, [T,1]);
+%x = xi + tau + U;
 
 % error terms
 
 randn('seed',202101);
-%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
+eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
 
-Z_eps = normrnd(0,1, [T,reps]);
-tau_eps = abs(Z_eps);
-rand('seed',222022);
-U_eps = normrnd(0,1, [T,reps]);
-eps = xi + tau_eps + U_eps;
+%Z_eps = normrnd(0,1, [T,reps]);
+%tau_eps = abs(Z_eps);
+%rand('seed',222022);
+%U_eps = normrnd(0,1, [T,reps]);
+%eps = xi + tau_eps + U_eps;
     
     
 % dependent variables, in each of the repetitions
@@ -127,10 +127,10 @@ while r < reps+0.5
         y_avg     = mean(y(i:i+1, r));
         numerator = y(i+1,r) - y(i,r);
         denominator = x(i+1,1) - x(i,1);
-        b_hat     = numerator/denominator;
-        alpha_hat = y_avg - b_hat*x_avg;
-        pairwise_betas(1,i)=alpha_hat;
-        pairwise_betas(2,i)=b_hat;
+        b_hat_i     = numerator/denominator;
+        alpha_hat_i = y_avg - b_hat_i*x_avg;
+        pairwise_betas(1,i)=alpha_hat_i;
+        pairwise_betas(2,i)=b_hat_i;
     end
     
     delta_x = diff(x);

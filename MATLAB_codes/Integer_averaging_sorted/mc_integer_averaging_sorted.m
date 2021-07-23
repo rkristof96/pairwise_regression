@@ -144,10 +144,10 @@ while r < reps+0.5
             y_avg     = mean(y_first_and_last);
             numerator = y(i,r) - y(1,r);
             denominator = x(i,1) - x(1,1);
-            b_hat     = numerator/denominator;
-            alpha_hat = mean(y_first_and_last) - b_hat*mean(x_first_and_last);
-            pairwise_betas(1,i)=alpha_hat;
-            pairwise_betas(2,i)=b_hat;
+            b_hat_i     = numerator/denominator;
+            alpha_hat_i = mean(y_first_and_last) - b_hat_i*mean(x_first_and_last);
+            pairwise_betas(1,i)=alpha_hat_i;
+            pairwise_betas(2,i)=b_hat_i;
         end;
     end;
     

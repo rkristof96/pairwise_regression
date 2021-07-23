@@ -10,7 +10,7 @@ global pairwise_beta1;
 
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 sigma = 1;
 xi = -sqrt(2/pi);
 
@@ -36,14 +36,14 @@ x = rand(T,1)*20-10;
 % error terms
 
 randn('seed',202101);
-%eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
+eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
 
 Z_eps = normrnd(0,1, [T,reps]);
 tau_eps = abs(Z_eps);
 rand('seed',222022);
 U_eps = normrnd(0,1, [T,reps]);
-eps = xi + tau_eps + U_eps;
+%eps = xi + tau_eps + U_eps;
 
 % dependent variables, in each of the repetitions
 
@@ -136,7 +136,7 @@ while r < reps+0.5
                 numerator = y(j,r) - y(i,r);
                 denominator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
-                alpha_hat_i = y_avg - b_hat*x_avg;
+                alpha_hat_i = y_avg - b_hat_i*x_avg;
                 pairwise_betas(1,counter)=alpha_hat_i;
                 pairwise_betas(2,counter)=b_hat_i;
                 counter   = counter+1;
@@ -147,7 +147,7 @@ while r < reps+0.5
     delta_x = delta_x';
     inv_delta_x = 1 ./delta_x;
     assigned_weight = delta_x;
-    assigned_weight = inv_delta_x;
+    %assigned_weight = inv_delta_x;
     
     pairwise_beta0 = pairwise_betas(1, :);
     pairwise_beta1 = pairwise_betas(2, :);

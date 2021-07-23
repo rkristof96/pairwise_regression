@@ -76,10 +76,10 @@ for i=(1:1:T-1)
     y_avg     = mean(y(i:i+1));
     numerator = y(i+1,1) - y(i,1);
     denominator = x(i+1,1) - x(i,1);
-    b_hat     = numerator/denominator;
-    alpha_hat = mean(y(i:i+1)) - b_hat*mean(x_sorted(i:i+1));
-    pairwise_betas_1(1,i)=alpha_hat;
-    pairwise_betas_1(2,i)=b_hat;
+    b_hat_i     = numerator/denominator;
+    alpha_hat_i = mean(y(i:i+1)) - b_hat_i*mean(x_sorted(i:i+1));
+    pairwise_betas_1(1,i)=alpha_hat_i;
+    pairwise_betas_1(2,i)=b_hat_i;
 end;
 
 %display average of betas
@@ -102,10 +102,10 @@ for i=(1:1:T)
         y_avg     = mean(y(i:i+1));
         numerator = y(i+1,1) - y(i,1);
         denominator = x(i+1,1) - x(i,1);
-        b_hat     = numerator/denominator;
-        alpha_hat = mean(y(i:i+1)) - b_hat*mean(x_sorted(i:i+1));
-        pairwise_betas_2(1,i)=alpha_hat;
-        pairwise_betas_2(2,i)=b_hat;
+        b_hat_i     = numerator/denominator;
+        alpha_hat_i = mean(y(i:i+1)) - b_hat_i*mean(x_sorted(i:i+1));
+        pairwise_betas_2(1,i)=alpha_hat_i;
+        pairwise_betas_2(2,i)=b_hat_i;
     else
         x_sorted_first_and_last = [x_sorted(1); x_sorted(T)];
         y_first_and_last = [y(1); y(T)];
@@ -114,10 +114,10 @@ for i=(1:1:T)
         y_avg     = mean(y_first_and_last);
         numerator = y(i,1) - y(1,1);
         denominator = x(i,1) - x(1,1);
-        b_hat     = numerator/denominator;
-        alpha_hat = mean(y_first_and_last) - b_hat*mean(x_sorted_first_and_last);
-        pairwise_betas_2(1,i)=alpha_hat;
-        pairwise_betas_2(2,i)=b_hat;
+        b_hat_i     = numerator/denominator;
+        alpha_hat_i = mean(y_first_and_last) - b_hat_i*mean(x_sorted_first_and_last);
+        pairwise_betas_2(1,i)=alpha_hat_i;
+        pairwise_betas_2(2,i)=b_hat_i;
     end;
     % calculate (Tx1) vector of residuals
     %resid     = y-x_matr*b_hat;

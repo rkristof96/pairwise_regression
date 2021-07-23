@@ -118,10 +118,10 @@ while r < reps+0.5
         y_avg     = mean(y(i:i+1, r));
         numerator = y(i+1,r) - y(i,r);
         denominator = x(i+1,1) - x(i,1);
-        b_hat     = numerator/denominator;
-        alpha_hat = y_avg - b_hat*x_avg;
-        pairwise_betas(1,i)=alpha_hat;
-        pairwise_betas(2,i)=b_hat;
+        b_hat_i     = numerator/denominator;
+        alpha_hat_i = y_avg - b_hat_i*x_avg;
+        pairwise_betas(1,i)=alpha_hat_i;
+        pairwise_betas(2,i)=b_hat_i;
     end
     % Obtain the delta-x weighted average of pairwise betas
     

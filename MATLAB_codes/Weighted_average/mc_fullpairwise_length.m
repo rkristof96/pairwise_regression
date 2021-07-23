@@ -12,7 +12,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -137,7 +137,7 @@ while r < reps+0.5
                 numerator = y(j,r) - y(i,r);
                 denominator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
-                alpha_hat_i = y_avg - b_hat*x_avg;
+                alpha_hat_i = y_avg - b_hat_i*x_avg;
                 pairwise_betas(1,counter)=alpha_hat_i;
                 pairwise_betas(2,counter)=b_hat_i;
                 counter   = counter+1;
