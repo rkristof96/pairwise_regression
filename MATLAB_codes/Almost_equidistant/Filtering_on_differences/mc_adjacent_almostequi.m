@@ -8,10 +8,11 @@ alpha = 1;
 beta  = 1.5;
 sigma = 1;
 epsilon = 0.01;
+xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 
@@ -23,8 +24,14 @@ reps = 1000; % number of Monte Carlo repetitions
 rand('seed',202101);
 % generate x: (Tx1) vector of uniformly distributed random
 %    variables on the interval (-1;+1) 
-x = rand(T,1)*2-1;
+%x = rand(T,1)*2-1;
 %x = normrnd(50,25, [T,1]);
+
+Z = normrnd(0,1, [T,1]);
+tau = abs(Z);
+rand('seed',202020);
+U = normrnd(0,1, [T,1]);
+x = xi + tau + U;
 
 
 % error terms
@@ -100,7 +107,7 @@ fprintf('  Beta:%8.4f',standard_dev2);
 %%%%%%%%%%%%%%
 % ADJACENT ALMOST EQUI PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)  %
 %%%%%%%%%%%%%%
-b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
+b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 
 % Calculate d_1
 
@@ -112,13 +119,19 @@ r = 1;
 while r < reps+0.5 
     sum_delta_y = 0;
     N = 0;
-    pairwise_beta_sum = 0;
+    pairwise_beta_1_sum = 0;
+    pairwise_beta_0_sum = 0;
     for i=(1:1:T-1)
         for j=(1:1:20)
             absolute_deviation = abs(abs(x_differences(i))-j*d);
             if absolute_deviation<epsilon
                 sum_delta_y = sum_delta_y + y(i+1,r)-y(i,r);
-                pairwise_beta_sum = pairwise_beta_sum + (y(i+1,r)-y(i,r))/(x(i+1,1)-x(i,1));
+                x_avg     = mean(x(i:i+1));
+                y_avg     = mean(y(i:i+1, r));
+                beta_hat_i = (y(i+1,r)-y(i,r))/(x(i+1,1)-x(i,1));
+                alpha_hat_i = y_avg - beta_hat_i*x_avg;
+                pairwise_beta_1_sum = pairwise_beta_1_sum + beta_hat_i;
+                pairwise_beta_0_sum =pairwise_beta_0_sum + alpha_hat_i;
                 N = N+1;
             end
         end
@@ -126,26 +139,31 @@ while r < reps+0.5
     
     %estimate beta
     %beta_hat = sum_delta_y/(N*d);
-    beta_hat = pairwise_beta_sum/N;
+    beta_hat = pairwise_beta_1_sum/N;
+    alpha_hat = pairwise_beta_0_sum/N;
     
-    b_hat_all(1,r)        = beta_hat;
+    b_hat_all(1,r)        = alpha_hat;
+    b_hat_all(2,r)        = beta_hat;
 
     r = r + 1;
 end
 
 standard_dev1=std(b_hat_all(1,:));
+standard_dev2=std(b_hat_all(2,:));
+
 
 %%%%%%%%%%%%
 % PRINTING %
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n ADJACENT ALMOST EQUI PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
+fprintf('\n ADJACENT PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST)\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
-fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
+fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
+fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
-fprintf('  Beta:%8.4f',standard_dev1);
+fprintf('Alpha:%8.4f',standard_dev1);
+fprintf('  Beta:%8.4f',standard_dev2);
 fprintf('\n  Number of observations we keep:%8.4f',N);
 fprintf('\n  d is equal to:%8.4f',d);
-
 

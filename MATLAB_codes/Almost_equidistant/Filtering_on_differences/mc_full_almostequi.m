@@ -8,6 +8,7 @@ alpha = 1;
 beta  = 1.5;
 sigma = 1;
 epsilon = 0.01;
+xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
@@ -24,6 +25,14 @@ rand('seed',202101);
 %    variables on the interval (-1;+1) 
 x = rand(T,1)*2-1;
 %x = normrnd(50,25, [T,1]);
+
+Z = normrnd(0,1, [T,1]);
+tau = abs(Z);
+rand('seed',202020);
+U = normrnd(0,1, [T,1]);
+%x = xi + tau + U;
+
+
 
 % error terms
 
@@ -101,7 +110,7 @@ fprintf('  Beta:%8.4f',standard_dev2);
 % Full PAIRWISE ESTIMATION %
 %%%%%%%%%%%%%%
 
-b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
+b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 
 r = 1;
 while r < reps+0.5
@@ -110,6 +119,11 @@ while r < reps+0.5
     delta_y = zeros(1,number_of_pairs);
     counter = 1;
     
+    x1_aux = zeros(1,number_of_pairs);
+    x2_aux = zeros(1,number_of_pairs);
+    y1_aux = zeros(1,number_of_pairs);
+    y2_aux = zeros(1,number_of_pairs);
+    
     % iterate over all pairs
     for i=(1:1:T-1)
         for j=(2:1:T)
@@ -117,6 +131,10 @@ while r < reps+0.5
                 % calculate x difference
                 delta_x(1, counter) = x(j,1) - x(i,1);
                 delta_y(1, counter) = y(j,r) - y(i,r);
+                x1_aux(1, counter) = x(j,1);
+                x2_aux(1, counter) = x(i,1);
+                y1_aux(1, counter) = y(j,r);
+                y2_aux(1, counter) = y(i,r);
                 counter = counter + 1;
             end
         end
@@ -128,13 +146,19 @@ while r < reps+0.5
     d = median(abs_delta_x);
     sum_delta_y = 0;
     N = 0;
-    pairwise_beta_sum = 0;
+    pairwise_beta_1_sum = 0;
+    pairwise_beta_0_sum = 0;
     for i=(1:1:number_of_pairs)
         for j=(1:1:20)
             absolute_deviation = abs(abs(delta_x(1, i))-j*d);
             if absolute_deviation<epsilon
-                sum_delta_y = sum_delta_y + delta_y(1, i);
-                pairwise_beta_sum = pairwise_beta_sum + delta_y(1, i)/delta_x(1, i);                
+                sum_delta_y = sum_delta_y + delta_y(1,i);
+                x_avg     = mean([x1_aux(1, i) x2_aux(1, i)]);
+                y_avg     = mean([y1_aux(1, i) y2_aux(1, i)]);
+                beta_hat_i = delta_y(1,i)/delta_x(1,i);
+                alpha_hat_i = y_avg - beta_hat_i*x_avg;
+                pairwise_beta_1_sum = pairwise_beta_1_sum + beta_hat_i;
+                pairwise_beta_0_sum =pairwise_beta_0_sum + alpha_hat_i;
                 N = N+1;
             end
         end
@@ -142,14 +166,17 @@ while r < reps+0.5
     
     %estimate beta
     %beta_hat = sum_delta_y/(N*d);
-    beta_hat = pairwise_beta_sum/N;
+    beta_hat = pairwise_beta_1_sum/N;
+    alpha_hat = pairwise_beta_0_sum/N;
     
-    b_hat_all(1,r)        = beta_hat;
-    
+    b_hat_all(1,r)        = alpha_hat;
+    b_hat_all(2,r)        = beta_hat;
+        
     r = r + 1;
 end
 
 standard_dev1=std(b_hat_all(1,:));
+standard_dev2=std(b_hat_all(2,:));
 
 %%%%%%%%%%%%
 % PRINTING %
@@ -159,7 +186,9 @@ fprintf('\n');
 fprintf('\n FULL PAIRWISE ESTIMATION\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
-fprintf('\n Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
-fprintf('  Beta:%8.4f',standard_dev1);
+fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
+fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
+fprintf('Alpha:%8.4f',standard_dev1);
+fprintf('  Beta:%8.4f',standard_dev2);
 fprintf('\n  Number of observations we keep:%8.4f',N);
 fprintf('\n  d is equal to:%8.4f',d);

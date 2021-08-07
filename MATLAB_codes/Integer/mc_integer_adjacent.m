@@ -10,7 +10,7 @@ beta  = 1.5;
 sigma = sqrt(0.5);
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -35,7 +35,7 @@ eps_endog = eps + 10 * x_standard;
 % random shuffle
 x_and_eps = [x eps];
 
-randn('seed',202102);
+randn('seed',202103);
 random_x_and_eps = x_and_eps(randperm(size(x_and_eps, 1)), :);
 
 x = random_x_and_eps(:,1);
@@ -131,14 +131,15 @@ while r < reps+0.5
     end
     
     delta_x = diff(x);
-    %delta_x = 1./delta_x;
-    %delta_x = abs(delta_x);
-    weighting_delta_x = delta_x;
-    sum_delta_x = sum(weighting_delta_x);
-    weighted_parwise_betas = pairwise_betas*weighting_delta_x;
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_x;
+    delta_y = diff(y);
+    delta_x = 1./delta_x;
+    delta_x = abs(delta_x);
+    weighting_delta = delta_y;
+    sum_weighting_delta = sum(weighting_delta);
+    weighted_parwise_betas = pairwise_betas*weighting_delta;
+    weighted_average_parwise_betas = weighted_parwise_betas./sum_weighting_delta;
    
-    average_parwise_betas = mean(pairwise_betas,2);
+    %average_parwise_betas = mean(pairwise_betas,2);
     
     %b_hat_all(1,r)        = average_parwise_betas(1,:);
     %b_hat_all(2,r)        = average_parwise_betas(2,:);
@@ -159,7 +160,7 @@ standard_dev2=std(b_hat_all(2,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n SORTED PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
+fprintf('\n PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));

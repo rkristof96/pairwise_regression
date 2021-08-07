@@ -6,7 +6,7 @@ clc;
 
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 sigma = 1;
 xi = -sqrt(2/pi);
 
@@ -145,7 +145,7 @@ while r < reps+0.5
         end
     end
 
-    % Obtain the delta-x weighted average of pairwise betas
+    % Obtain the length weighted average of pairwise betas
     
     inv_length = 1./length;
     
@@ -156,10 +156,10 @@ while r < reps+0.5
     %weighted_average_parwise_betas = weighted_parwise_betas./number_of_betas;
     
     % Simple average for beta_0
-    pairwise_betas = sum(pairwise_betas,2)./number_of_betas;
-    b_hat_all(1,r)        = pairwise_betas(1);    
+    %pairwise_betas = sum(pairwise_betas,2)./number_of_betas;
+    %b_hat_all(1,r)        = pairwise_betas(1);    
     
-    %b_hat_all(1,r)        = weighted_average_parwise_betas(1);
+    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
     
 

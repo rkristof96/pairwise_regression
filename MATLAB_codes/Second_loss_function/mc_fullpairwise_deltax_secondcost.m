@@ -15,7 +15,7 @@ sigma = 1;
 
 b_true = [alpha;beta;sigma];
 
-T = 500; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -130,8 +130,8 @@ while r < reps+0.5
     end
     
     delta_x = delta_x';
-    %abs_x = abs(delta_x);
-    abs_x = delta_x;
+    abs_x = abs(delta_x);
+    %abs_x = delta_x;
     assigned_weight = abs_x;
     %assigned_weight = 1./abs_x;
     

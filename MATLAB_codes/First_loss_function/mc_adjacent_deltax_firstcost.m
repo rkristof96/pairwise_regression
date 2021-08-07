@@ -9,13 +9,13 @@ global pairwise_beta1;
 % true parameters
 
 alpha = 1;
-beta  = 0.5;
+beta  = 1.5;
 sigma = 1;
 xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 500; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
