@@ -7,33 +7,27 @@ clc;
 
 alpha = 1;
 beta  = 1.5;
-sigma = sqrt(0.5);
+sigma = sqrt(10);
+a = 0;
+b = 1;
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
-T_sub = 0.6 * T;
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
-x = [1:T]';
+rng('default');
+i = unidrnd(20,T,1);
 
-s = RandStream('mlfg6331_64'); 
-x = datasample(s,x,T_sub,'Replace',false);
-
-T = T_sub;
+x = a + b * i;
 
 % error terms
 
 randn('seed',202101);
 eps = normrnd(0,sigma, [T,reps]);  %generate (T x reps) matrix of normally distributed i.i.d. errors,
     %with mean 0 and variance sigma^2
-    
-x_mean = mean(x);
-x_std = std(x);
 
-x_standard = (x-x_mean)/(x_std*sqrt(2));
-
-eps_endog = eps + 10 * x_standard;
+eps_endog = x + eps;
 
 % Make epsilon endogenous
 eps = eps_endog;
@@ -115,34 +109,51 @@ fprintf('  Beta:%8.4f',standard_dev2);
 
 
 %%%%%%%%%%%%%%
-% SORTED PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %
+% ADJACENT PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %
 %%%%%%%%%%%%%%
 
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 
 r = 1;
+
+pairwise_coeffs_to_keep = 0;
+    
+for i=(1:1:T-1)
+    if x(i+1,1) - x(i,1) ~= 0
+        pairwise_coeffs_to_keep = pairwise_coeffs_to_keep+1;
+    end
+end
+
 while r < reps+0.5
-    pairwise_betas=zeros(2,T-1);
+    
+    pairwise_betas=zeros(2,pairwise_coeffs_to_keep);
+    delta_x = zeros(1,pairwise_coeffs_to_keep);
+    delta_y = zeros(1,pairwise_coeffs_to_keep);
+    
+    counter = 1;
     
     for i=(1:1:T-1)
-        % calculate betahat
-        x_avg     = mean(x(i:i+1));
-        y_avg     = mean(y(i:i+1, r));
-        numerator = y(i+1,r) - y(i,r);
-        denominator = x(i+1,1) - x(i,1);
-        b_hat_i     = numerator/denominator;
-        alpha_hat_i = y_avg - b_hat_i*x_avg;
-        pairwise_betas(1,i)=alpha_hat_i;
-        pairwise_betas(2,i)=b_hat_i;
+        if x(i+1,1) - x(i,1) ~= 0
+            % calculate betahat
+            x_avg     = mean(x(i:i+1));
+            y_avg     = mean(y(i:i+1, r));
+            numerator = y(i+1,r) - y(i,r);
+            denominator = x(i+1,1) - x(i,1);
+            b_hat_i     = numerator/denominator;
+            alpha_hat_i = y_avg - b_hat_i*x_avg;
+            pairwise_betas(1,counter)=alpha_hat_i;
+            pairwise_betas(2,counter)=b_hat_i;
+            delta_x(1,counter)=denominator;
+            delta_y(1,counter)=numerator;
+            counter = counter + 1;
+        end
     end
     
-    delta_x = diff(x);
-    delta_y = diff(y);
     %delta_x = 1./delta_x;
     %delta_x = abs(delta_x);
     weighting_delta = delta_y;
     sum_weighting_delta = sum(weighting_delta);
-    weighted_parwise_betas = pairwise_betas*weighting_delta;
+    weighted_parwise_betas = pairwise_betas*weighting_delta';
     weighted_average_parwise_betas = weighted_parwise_betas./sum_weighting_delta;
    
     average_parwise_betas = mean(pairwise_betas,2);
@@ -166,11 +177,11 @@ standard_dev2=std(b_hat_all(2,:));
 %%%%%%%%%%%%
 
 fprintf('\n');
-fprintf('\n PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
+fprintf('\n ADJACENT PAIRWISE ESTIMATION (WITH CONNECTING FIRST AND LAST)\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
 fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',standard_dev1);
-fprintf('  Beta:%8.4f',standard_dev2);
-
+fprintf('  Beta:%8.4f\n',standard_dev2);
+fprintf('  Pairwise coefficients we keep:%8.4f',pairwise_coeffs_to_keep);

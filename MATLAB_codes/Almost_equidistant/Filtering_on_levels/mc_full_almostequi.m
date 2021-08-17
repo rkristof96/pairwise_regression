@@ -170,7 +170,8 @@ while r < reps+0.5
     for i=(1:1:number_of_pairs)
         for j=(1:1:20)
             absolute_deviation = abs(abs(delta_x(1, i))-j*d);
-            if absolute_deviation<2*epsilon
+            simple_deviation = abs(delta_x(1, i));
+            if simple_deviation<2*epsilon
                 sum_delta_y = sum_delta_y + delta_y(1, i);
                 x_avg     = mean([x1_aux(1, i) x2_aux(1, i)]);
                 y_avg     = mean([y1_aux(1, i) y2_aux(1, i)]);
@@ -195,6 +196,8 @@ while r < reps+0.5
 end
 
 standard_dev1=std(b_hat_all(1,:));
+standard_dev2=std(b_hat_all(2,:));
+
 
 %%%%%%%%%%%%
 % PRINTING %
