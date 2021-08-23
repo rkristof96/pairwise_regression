@@ -48,7 +48,7 @@ y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables
 % sort
 x_y_eps = [x y eps];
 
-%x_y_eps = sortrows(x_y_eps,1);
+x_y_eps = sortrows(x_y_eps,1);
 
 x = x_y_eps(:,1);
 y = x_y_eps(:,2:reps+1);
@@ -116,11 +116,17 @@ b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th 
 
 r = 1;
 
+x_eps_corr = zeros(1,reps);
+
 pairwise_coeffs_to_keep = 0;
     
 for i=(1:1:T-1)
-    if x(i+1,1) - x(i,1) ~= 0
-        pairwise_coeffs_to_keep = pairwise_coeffs_to_keep+1;
+    for j=(2:1:T)
+        if i<j
+            if x(j,1) - x(i,1) == 1
+                pairwise_coeffs_to_keep = pairwise_coeffs_to_keep+1;
+            end
+        end
     end
 end
 
@@ -133,37 +139,44 @@ while r < reps+0.5
     counter = 1;
     
     for i=(1:1:T-1)
-        if x(i+1,1) - x(i,1) ~= 0
-            % calculate betahat
-            x_avg     = mean(x(i:i+1));
-            y_avg     = mean(y(i:i+1, r));
-            numerator = y(i+1,r) - y(i,r);
-            denominator = x(i+1,1) - x(i,1);
-            b_hat_i     = numerator/denominator;
-            alpha_hat_i = y_avg - b_hat_i*x_avg;
-            pairwise_betas(1,counter)=alpha_hat_i;
-            pairwise_betas(2,counter)=b_hat_i;
-            delta_x(1,counter)=denominator;
-            delta_y(1,counter)=numerator;
-            counter = counter + 1;
+        for j=(2:1:T)
+            if i<j
+                if x(j,1) - x(i,1) == 1
+                    % calculate y difference
+                    delta_y(1, counter) = y(j,r) - y(i,r);
+                    delta_x(1, counter) = x(j,1) - x(i,1);                
+                    % calculate betahat
+                    x_avg     = (x(i,1)+x(j,1))/2;
+                    y_avg     = (y(i,r)+y(j,r))/2;          
+                    numerator = y(j,r) - y(i,r);
+                    denominator = x(j,1) - x(i,1);
+                    b_hat_i     = numerator/denominator;
+                    alpha_hat_i = y_avg - b_hat_i*x_avg;
+                    pairwise_betas(1,counter)=alpha_hat_i;
+                    pairwise_betas(2,counter)=b_hat_i;
+                    counter = counter + 1;
+                end
+            end
         end
     end
     
     %delta_x = 1./delta_x;
     %delta_x = abs(delta_x);
-    weighting_delta = delta_y;
+    weighting_delta = delta_x;
     sum_weighting_delta = sum(weighting_delta);
     weighted_parwise_betas = pairwise_betas*weighting_delta';
     weighted_average_parwise_betas = weighted_parwise_betas./sum_weighting_delta;
    
-    average_parwise_betas = mean(pairwise_betas,2);
+    %average_parwise_betas = mean(pairwise_betas,2);
     
-    b_hat_all(1,r)        = average_parwise_betas(1,:);
-    b_hat_all(2,r)        = average_parwise_betas(2,:);
+    %b_hat_all(1,r)        = average_parwise_betas(1,:);
+    %b_hat_all(2,r)        = average_parwise_betas(2,:);
 
-    %b_hat_all(1,r)        = weighted_average_parwise_betas(1);
-    %b_hat_all(2,r)        = weighted_average_parwise_betas(2);
- 
+    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
+    b_hat_all(2,r)        = weighted_average_parwise_betas(2);
+    
+    corr_matrix       = corrcoef(x,eps(:,r));
+    x_eps_corr(1,r)   = corr_matrix(2,1);
 
     r = r + 1;
 end
@@ -171,6 +184,8 @@ end
 standard_dev1=std(b_hat_all(1,:));
 
 standard_dev2=std(b_hat_all(2,:));
+
+x_eps_corr_mean = mean(x_eps_corr,2);
 
 %%%%%%%%%%%%
 % PRINTING %
@@ -184,4 +199,5 @@ fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',standard_dev1);
 fprintf('  Beta:%8.4f\n',standard_dev2);
-fprintf('  Pairwise coefficients we keep:%8.4f',pairwise_coeffs_to_keep);
+fprintf('  Pairwise coefficients we keep:%8.4f\n',pairwise_coeffs_to_keep);
+fprintf('  Correlation coefficient:%8.4f',x_eps_corr_mean);
