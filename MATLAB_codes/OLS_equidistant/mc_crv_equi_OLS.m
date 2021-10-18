@@ -5,20 +5,21 @@ clc;
 % true parameters
 
 alpha = 0;
-beta  = 1.5;
+beta  = 4.2;
 sigma = sqrt(10);
-a = 0;
-b = 1;
+%a = 0;
+%b = 1;
+integers_to_keep = [-1.4];
+%d = 2;
+epsilon = 0.1;
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
 rng('default');
-i = unidrnd(20,T,1);
-
-x = a + b * i;
+x = normrnd(0,sigma, [T,1]);
 
 % error terms
 
@@ -57,40 +58,61 @@ eps = x_y_eps(:,reps+2:end);
 % OLS ESTIMATION %
 %%%%%%%%%%%%%%
 
+counter = 0;
+
 for i=(1:1:T)
-    if x(i,1) = integer_to_keep
-        counter = counter + 1;
+    for j=1:length(integers_to_keep)
+        if (integers_to_keep(j)-epsilon <= x(i,1)) && (x(i,1) <= integers_to_keep(j)+epsilon)
+            counter = counter + 1;
+        end
     end
 end
 
-x_matr = [ones(T,1) x];  % this is matrix X in betahat = (X'X)^(-1)*(X'y)
-var_true = (sigma^2)*inv(x_matr'*x_matr);  % true variance-covariance matrix
+x_kept = zeros(counter, 1);
+y_kept = zeros(counter, reps);
+eps_kept = zeros(counter, reps);
 
-b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
+holder = 1;
+
+for i=(1:1:T)
+    for j=1:length(integers_to_keep)
+        if (integers_to_keep(j)-epsilon <= x(i,1)) && (x(i,1) <= integers_to_keep(j)+epsilon)
+            x_kept(holder, 1) = integers_to_keep(j);
+            y_kept(holder, :) = y(i, :);
+            eps_kept(holder, :) = eps(i,:);
+            holder = holder +1;
+        end
+    end
+end
+
+x = x_kept;
+y = y_kept;
+eps = eps_kept;
+
+%x_matr = [ones(T,1) x];  % this is matrix X in betahat = (X'X)^(-1)*(X'y)
+%var_true = (sigma^2)*inv(x_matr'*x_matr);  % true variance-covariance matrix
+
+b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
+
+x_eps_corr = zeros(1,reps);
 
 r = 1;
 while r < reps+0.5
-    x_avg     = mean(x);
-    y_avg     = mean(y);
-    y_avg_r   = y_avg(r);
-    numerator = 0;
-    denominator = 0;
-    for i=(1:1:T)
-        x_dev = x(i,1)-x_avg;
-        y_dev = y(i,r)-y_avg_r;
-        numerator = numerator + x_dev*y_dev;
-        denominator = denominator + x_dev*x_dev;
-    end;
+    numerator = x(:, 1)' * y(:,r);
+    denominator = x(:, 1)' * x(:, 1);
+    
     b_hat              = numerator/denominator;
-    b_hat_all(2,r)     = b_hat;
-    b_hat_all(1,r)     = y_avg_r - b_hat*x_avg;
+    b_hat_all(1,r)     = b_hat;
 
+    corr_matrix       = corrcoef(x,eps(:,r));
+    x_eps_corr(1,r)   = corr_matrix(2,1);
+    
     r = r + 1;
 end
 
 standard_dev1=std(b_hat_all(1,:));
 
-standard_dev2=std(b_hat_all(2,:));
+x_eps_corr_mean = mean(x_eps_corr,2);
 
 %%%%%%%%%%%%
 % PRINTING %
@@ -106,8 +128,9 @@ fprintf('  Sigma:%8.4f\n',b_true(3));
 fprintf('\n');
 fprintf('OLS Estimation\n');
 fprintf('Estimated parameters (mean of Monte Carlo repetitions)\n');
-fprintf('Alpha:%8.4f',mean(b_hat_all(1,:),2));
-fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
+fprintf('  Beta:%8.4f\n',mean(b_hat_all(1,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
-fprintf('Alpha:%8.4f',standard_dev1);
-fprintf('  Beta:%8.4f',standard_dev2);
+fprintf('  Beta:%8.4f\n',standard_dev1);
+fprintf('Number of observations we keep\n');
+fprintf('  N:%8.4f',counter);
+fprintf('  Correlation coefficient:%8.4f',x_eps_corr_mean);

@@ -9,7 +9,7 @@ beta  = 1.5;
 sigma = sqrt(10);
 a = 0;
 b = 1;
-integer_to_keep = 3;
+integers_to_keep = [19 20];
 b_true = [alpha;beta;sigma];
 
 T = 5000; % number of observations
@@ -61,8 +61,7 @@ eps = x_y_eps(:,reps+2:end);
 counter = 0;
 
 for i=(1:1:T)
-    if x(i,1) == integer_to_keep
-        x(i,1)
+    if any(x(i,1) == integers_to_keep)
         counter = counter + 1;
     end
 end
@@ -73,7 +72,7 @@ y_kept = zeros(counter, reps);
 holder = 1;
 
 for i=(1:1:T)
-    if x(i,1) == integer_to_keep
+    if any(x(i,1) == integers_to_keep)
         x_kept(holder, 1) = x(i,1);
         y_kept(holder, :) = y(i, :);
         holder = holder +1;

@@ -168,7 +168,6 @@ while r < reps+0.5
     weighted_parwise_betas = pairwise_betas*weighting_delta';
     weighted_average_parwise_betas = weighted_parwise_betas./sum_weighting_delta;
    
-    
     %average_parwise_betas = mean(pairwise_betas,2);
     
     %b_hat_all(1,r)        = average_parwise_betas(1,:);
