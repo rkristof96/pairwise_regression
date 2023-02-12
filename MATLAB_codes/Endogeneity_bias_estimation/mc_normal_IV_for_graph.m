@@ -19,7 +19,7 @@ for theta=(0:0.1:0.7)
     %%%%%%%%%%%%%%
     % IV ESTIMATION %
     %%%%%%%%%%%%%%
-
+    
     b_hat_all = zeros(1,reps);  % store estimated betahats, r-th repetition in r-th column
     bias_hat_all = zeros(1,reps);
     bias_hat_all_perc = zeros(1,reps);
@@ -120,8 +120,8 @@ for theta=(0:0.1:0.7)
     %fprintf('  N:%8.4f\n',counter);
     fprintf('  Correlation coefficient:%8.4f\n',x_u_corr_mean);
     fprintf('  St dev of correlation coefficient:%8.4f\n',standard_dev4);
-
-    to_save = [theta, mean(bias_hat_all_perc(1,:),2), standard_dev3, x_u_corr_mean];
+    
+    to_save = [theta, mean(bias_hat_all(1,:),2), standard_dev2, x_u_corr_mean];
 
     fid = fopen('hello.txt', 'a+');
     fprintf(fid, '%6.4f %6.4f %6.4f %6.4f\n', to_save);
