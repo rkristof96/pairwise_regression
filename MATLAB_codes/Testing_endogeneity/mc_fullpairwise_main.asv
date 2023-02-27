@@ -1,0 +1,155 @@
+%prepare WD
+clear all
+close all
+clc
+
+%% Normal DGP
+% define parameter
+% absolute weighted difference
+abs_dummy = 'True'; 
+% DGP
+dist = 'norm';
+run('mc_fullpairwise_deltax_parfor.m')
+
+% define parameter
+% simple weighted difference
+abs_dummy = 'False'; 
+% DGP
+dist = 'norm';
+run('mc_fullpairwise_deltax_parfor.m')
+
+%% Uniform DGP
+% define parameter
+% absolute weighted difference
+abs_dummy = 'True'; 
+% DGP
+dist = 'uniform';
+run('mc_fullpairwise_deltax_parfor.m')
+
+% define parameter
+% simple weighted difference
+abs_dummy = 'False'; 
+% DGP
+dist = 'uniform';
+run('mc_fullpairwise_deltax_parfor.m')
+%%
+%Normal
+ T_list = [50, 500, 5000];
+%reload and combine data
+req_date ='23-Feb-2023';
+abs_beta_out =[];
+abs_corr_out =[];
+abs_tstat_out = [];
+
+noabs_beta_out =[];
+noabs_corr_out =[];
+noabs_tstat_out =[];
+for ss =1:length(T_list)
+    
+    abs_beta_add =load(strcat('Results/Norm_beta_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    abs_corr_add = load(strcat('Results/Norm_corr_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    abs_tstat_add = load(strcat('Results/Norm_tstat_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    
+    abs_beta_out = [abs_beta_out,abs_beta_add.x'];
+    abs_corr_out = [abs_corr_out,abs_corr_add.x'];
+    abs_tstat_out = [abs_tstat_out,abs_tstat_add.x'];
+    
+    noabs_beta_add = load(strcat('Results/Norm_beta_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    noabs_corr_add = load(strcat('Results/Norm_corr_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    noabs_tstat_add = load(strcat('Results/Norm_tstat_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+
+        
+    noabs_beta_out = [noabs_beta_out,noabs_beta_add.x'];
+    noabs_corr_out = [noabs_corr_out,noabs_corr_add.x'];
+    noabs_tstat_out = [noabs_tstat_out,noabs_tstat_add.x'];
+
+end
+
+
+abs_data_table_beta = table(abs_beta_out');
+abs_data_table_corr = table(abs_corr_out');
+abs_data_table_tstat = table(mean(abs_tstat_out,1)');
+
+noabs_data_table_beta = table(noabs_beta_out');
+noabs_data_table_corr = table(noabs_corr_out');
+noabs_data_table_tstat = table(mean(noabs_tstat_out,1)');
+
+% % write output
+writetable(abs_data_table_beta,strcat('Norm_abs_beta_', req_date,'.xlsx'))
+writetable(abs_data_table_corr,strcat('Norm_abs_corr_', req_date,'.xlsx'))
+writetable(abs_data_table_tstat,strcat('Norm_abs_tstat_', req_date,'.xlsx'))
+
+writetable(noabs_data_table_beta,strcat('Norm_noabs_beta_', req_date,'.xlsx'))
+writetable(noabs_data_table_corr,strcat('Norm_noabs_corr_', req_date,'.xlsx'))
+writetable(noabs_data_table_tstat,strcat('Norm_noabs_tstat_', req_date,'.xlsx'))
+
+%%
+
+%reload and combine data
+T_list = [50, 500, 5000];
+req_date ='24-Feb-2023';
+abs_beta_out =zeros(0);
+abs_corr_out =[];
+abs_tstat_out = [];
+
+noabs_beta_out =[];
+noabs_corr_out =[];
+noabs_tstat_out =[];
+for ss =1:length(T_list)
+   %%{ 
+    abs_beta_add =load(strcat('Results/Unif_beta_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    abs_corr_add = load(strcat('Results/Unif_corr_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    abs_tstat_add = load(strcat('Results/Unif_tstat_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    
+    
+    abs_beta_out = [abs_beta_out,abs_beta_add.x'];
+    abs_corr_out = [abs_beta_out,abs_corr_add.x'];
+    abs_tstat_out = [abs_tstat_out,abs_tstat_add.x'];
+    
+    %%}
+    %{
+    noabs_beta_add = load(strcat('Results/Unif_beta_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    noabs_corr_add = load(strcat('Results/Unif_corr_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    noabs_tstat_add = load(strcat('Results/Unif_tstat_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+
+        
+    noabs_beta_out = [noabs_beta_out,noabs_beta_add.x'];
+    noabs_corr_out = [noabs_beta_out,noabs_corr_add.x'];
+    noabs_tstat_out = [noabs_tstat_out,noabs_tstat_add.x'];
+%}
+end
+
+
+abs_data_table_beta = table(abs_beta_out');
+abs_data_table_corr = table(abs_corr_out');
+abs_data_table_tstat = table(mean(abs_tstat_out',1));
+
+noabs_data_table_beta = table(noabs_beta_out');
+noabs_data_table_corr = table(noabs_corr_out');
+noabs_data_table_tstat = table(mean(noabs_tstat_out',1));
+
+% % write output
+writetable(abs_data_table_beta,strcat('Unif_abs_beta_', req_date,'.xlsx'))
+writetable(abs_data_table_corr,strcat('Unif_abs_corr_', req_date,'.xlsx'))
+writetable(abs_data_table_tstat,strcat('Unif_abs_tstat_', req_date,'.xlsx'))
+
+writetable(noabs_data_table_beta,strcat('Unif_noabs_beta_', req_date,'.xlsx'))
+writetable(noabs_data_table_corr,strcat('Unif_noabs_corr_', req_date,'.xlsx'))
+writetable(noabs_data_table_tstat,strcat('Unif_notstat_corr_', req_date,'.xlsx'))
+
+
+%%
+st = load('Norm_tstat_Abs_deltax_T_50_21-Feb-2023.mat')
+
+hist(st.x(1,:))
+mean(st.x(1,:))
+
+hist(st.x(2,:))
+mean(st.x(2,:))
+
+hist(st.x(3,:))
+mean(st.x(3,:))
+
+hist(st.x(4,:))
+mean(st.x(4,:))
+
