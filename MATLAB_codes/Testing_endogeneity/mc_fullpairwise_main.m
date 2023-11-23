@@ -244,7 +244,7 @@ run('usual_suspects_mc_fullpairwise_weighted_parfor')
 
 
 %%
-sorted = '' ;%'_sorted';
+sorted = '_sorted' ;%'_sorted';
 
 %%%%%%%%
 %Normal%
