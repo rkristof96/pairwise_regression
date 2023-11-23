@@ -24,9 +24,9 @@ date_var = datestr(datetime('today'));
 %corr_matrix = zeros(length(sigma_list)*length(T_list)*2,2);
 %beta_matrix = zeros(length(sigma_list)*length(T_list)*2,2);
 
-abs_dummy = 'True'; % or Abs
-dist = 'unif';
-sorted = 'False';
+%abs_dummy = 'True'; % or Abs
+%dist = 'unif';
+%sorted = 'False';
  
 parfor sample_size_ind = 1:length(T_list)
 avg_bias_matrix = zeros(length(sigma_list)*2,4);

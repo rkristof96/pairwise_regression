@@ -24,9 +24,9 @@ date_var = datestr(datetime('today'));
 %corr_matrix = zeros(length(sigma_list)*length(T_list)*2,2);
 %beta_matrix = zeros(length(sigma_list)*length(T_list)*2,2);
 
-abs_dummy = 'True'; % or Abs
-dist = 'unif';
-sorted = 'True';
+%abs_dummy = 'True'; % or Abs
+%dist = 'norm';
+%sorted = 'False';
  
 parfor sample_size_ind = 1:length(T_list)
 avg_bias_matrix = zeros(length(sigma_list)*2,4);
@@ -321,7 +321,7 @@ else
     sorted_text = '';
 end
 
-if strcmp(abs_dummy,'True')
+if strcmp(abs_dummy,'True')==1
     if strcmp(dist,'norm')
         beta_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_beta_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
         %corr_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_corr_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
@@ -335,10 +335,10 @@ if strcmp(abs_dummy,'True')
     end 
 else
     if strcmp(dist,'norm')
-        beta_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_beta_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %corr_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_corr_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %tstat_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_tstat_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        bias_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_bias_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        beta_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_beta_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %corr_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_corr_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %tstat_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_tstat_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        bias_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_bias_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
     else
         beta_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_beta_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
         %corr_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_corr_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');

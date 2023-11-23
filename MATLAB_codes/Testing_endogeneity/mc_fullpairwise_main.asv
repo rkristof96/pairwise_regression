@@ -210,6 +210,9 @@ dist = 'norm';
 sorted = 'True';
 run('usual_suspects_mc_fullpairwise_weighted_parfor')
 % case 3
+clear all
+close all
+clc
 abs_dummy = 'False'; 
 dist = 'norm';
 sorted = 'False';
