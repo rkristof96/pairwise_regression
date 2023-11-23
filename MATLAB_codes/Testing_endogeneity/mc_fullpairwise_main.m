@@ -208,7 +208,7 @@ sorted = '' ;%'_sorted';
 T_list = [10, 50, 100, 500, 1000];%[10, 50, 100, 500, 1000]
 
 %reload and combine data
-req_date ='14-Nov-2023';
+req_date ='22-Nov-2023';
 abs_beta_out =[];
 abs_bias_out =[];
 
@@ -255,7 +255,7 @@ writetable(noabs_data_table_bias,strcat('Results/Excels/usual_suspects_fullpairw
 %Uniform
 T_list = [10, 50, 100, 500, 1000];%[10, 50, 100, 500, 1000]
 %reload and combine data
-req_date ='14-Nov-2023';
+req_date ='22-Nov-2023';
 abs_beta_out =[];
 abs_bias_out =[];
 
@@ -306,7 +306,7 @@ writetable(noabs_data_table_bias,strcat('Results/Excels/usual_suspects_fullpairw
 T_list = [10, 50, 100, 500, 1000];%[10, 50, 100, 500, 1000]
 
 %reload and combine data
-req_date ='18-Nov-2023';
+req_date ='22-Nov-2023';
 abs_beta_out =[];
 abs_bias_out =[];
 
@@ -340,7 +340,7 @@ writetable(abs_data_table_bias,strcat('Results/Excels/usual_suspects_nonsorted_a
 %Uniform
 T_list = [10, 50, 100, 500, 1000];%[10, 50, 100, 500, 1000]
 %reload and combine data
-req_date ='18-Nov-2023';
+req_date ='22-Nov-2023';
 abs_beta_out =[];
 abs_bias_out =[];
 

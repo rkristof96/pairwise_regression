@@ -25,7 +25,7 @@ date_var = datestr(datetime('today'));
 %beta_matrix = zeros(length(sigma_list)*length(T_list)*2,2);
 
 abs_dummy = 'True'; % or Abs
-dist = 'norm';
+dist = 'unif';
 sorted = 'False';
  
 parfor sample_size_ind = 1:length(T_list)
@@ -102,9 +102,9 @@ x = xy(:,1);
 y = xy(:,2:reps+1);
 
 
-%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
 % OLS ESTIMATION %
-%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
 
 x_matr = [ones(T,1) x];  % this is matrix X in betahat = (X'X)^(-1)*(X'y)
 var_true = (sigma^2)*inv(x_matr'*x_matr);  % true variance-covariance matrix
@@ -175,8 +175,8 @@ stdev_x_u_corr = std(x_u_corr_all);
 ols_avg_bias_alpha = mean(b_hat_all(1,:)-alpha,2);
 ols_avg_bias_beta = mean(b_hat_all(2,:)-beta,2);
 
-ols_std_bias_alpha = std(b_hat_all(1,:)-alpha,2);
-ols_std_bias_beta = std(b_hat_all(2,:)-beta,2);
+ols_std_bias_alpha = std(b_hat_all(1,:)-alpha);
+ols_std_bias_beta = std(b_hat_all(2,:)-beta);
 
 % bias
 avg_bias_matrix((sigma_ind-1)*2+1,3) = ols_avg_bias_alpha;
@@ -193,9 +193,9 @@ beta_matrix((sigma_ind-1)*2+1,4) = mean(b_hat_all(2,:),2);
 beta_matrix(sigma_ind*2,4) = standard_dev2;
 
 
-%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FULL PAIRWISE ESTIMATION %
-%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 x_u_corr_all = zeros(1,reps);
@@ -228,7 +228,7 @@ while r < reps+0.5
     pairwise_betas = sum(pairwise_betas,2)./(T-1);
     b_hat_all(1,r)        = pairwise_betas(1);
     
-    %b_hat_all(1,r)        = weighted_average_parwise_betas(1);
+    b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
 
     r = r + 1;   
@@ -275,12 +275,14 @@ avg_bias_matrix(sigma_ind*2,1) = std_bias_alpha;
 avg_bias_matrix((sigma_ind-1)*2+1,2) = avg_bias_beta;
 avg_bias_matrix(sigma_ind*2,2) = std_bias_beta;
 
+beta_matrix((sigma_ind-1)*2+1,1) = nanmean(b_hat_all(1,:),2);
 beta_matrix((sigma_ind-1)*2+1,2) = nanmean(b_hat_all(2,:),2);
 
 nan_err =sum(isnan(b_hat_all(2,:)));
 if nan_err ~= 0
    disp(num2str(nan_err))
 end
+beta_matrix(sigma_ind*2,1) = standard_dev1;
 beta_matrix(sigma_ind*2,2) = standard_dev2;
 
 end
