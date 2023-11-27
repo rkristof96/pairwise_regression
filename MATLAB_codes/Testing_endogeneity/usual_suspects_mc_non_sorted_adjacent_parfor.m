@@ -28,7 +28,7 @@ date_var = datestr(datetime('today'));
 %dist = 'unif';
 %sorted = 'False';
  
-parfor sample_size_ind = 1:length(T_list)
+for sample_size_ind = 1:length(T_list)
 avg_bias_matrix = zeros(length(sigma_list)*2,4);
 corr_matrix = zeros(length(sigma_list)*2,2);
 beta_matrix = zeros(length(sigma_list)*2,4);
@@ -66,9 +66,9 @@ for diag_i=(1:1:reps+1)
 end
 
 % select case uniform or normal DGP
-if strcmp(dist,'uniform')
+if strcmp(dist,'unif')
 %uniform case
-    %rng('default')  % For reproducibility
+    rng('default')  % For reproducibility
     R = mvnrnd(mu,cov_matrix,T); % generate data
     x = R(:,1);
     x = normcdf(x);
@@ -76,7 +76,7 @@ if strcmp(dist,'uniform')
 else
     % normal case
     cov_matrix(1,1) = 1;
-    %rng('default')  % For reproducibility
+    rng('default')  % For reproducibility
     R = mvnrnd(mu,cov_matrix,T);
     x = R(:,1); % select x
 end

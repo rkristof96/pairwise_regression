@@ -244,6 +244,7 @@ run('usual_suspects_mc_fullpairwise_weighted_parfor')
 
 
 %%
+%sorted = '';
 sorted = '_sorted' ;%'_sorted';
 
 %%%%%%%%
@@ -253,7 +254,7 @@ sorted = '_sorted' ;%'_sorted';
 T_list = [10, 50, 100, 500, 1000];%[10, 50, 100, 500, 1000]
 
 %reload and combine data
-req_date ='23-Nov-2023';
+req_date ='26-Nov-2023';
 abs_beta_out =[];
 abs_bias_out =[];
 
@@ -300,7 +301,7 @@ writetable(noabs_data_table_bias,strcat('Results/Excels/usual_suspects_fullpairw
 %Uniform
 T_list = [10, 50, 100, 500, 1000];%[10, 50, 100, 500, 1000]
 %reload and combine data
-req_date ='23-Nov-2023';
+req_date ='26-Nov-2023';
 abs_beta_out =[];
 abs_bias_out =[];
 
@@ -343,15 +344,22 @@ writetable(noabs_data_table_bias,strcat('Results/Excels/usual_suspects_fullpairw
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Non-sorted adjacent %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+abs_dummy = 'True';
+sorted = 'False';
+dist = 'norm';
+run('usual_suspects_mc_non_sorted_adjacent_parfor')
+dist = 'unif';
+run('usual_suspects_mc_non_sorted_adjacent_parfor')
 
 %%%%%%%%
 %Normal%
 %%%%%%%%
 
+sorted = '';
 T_list = [10, 50, 100, 500, 1000];%[10, 50, 100, 500, 1000]
 
 %reload and combine data
-req_date ='22-Nov-2023';
+req_date ='26-Nov-2023';
 abs_beta_out =[];
 abs_bias_out =[];
 
@@ -385,7 +393,7 @@ writetable(abs_data_table_bias,strcat('Results/Excels/usual_suspects_nonsorted_a
 %Uniform
 T_list = [10, 50, 100, 500, 1000];%[10, 50, 100, 500, 1000]
 %reload and combine data
-req_date ='22-Nov-2023';
+req_date ='26-Nov-2023';
 abs_beta_out =[];
 abs_bias_out =[];
 
