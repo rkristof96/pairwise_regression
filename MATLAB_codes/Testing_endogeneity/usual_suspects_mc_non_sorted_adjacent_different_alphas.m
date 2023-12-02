@@ -5,7 +5,7 @@
 % if you run the parallel tool you can set the number of core you use
 % not necessary, bu you can speed up the simulations
 %clust = parcluster;
-clust.NumWorkers=4;
+%clust.NumWorkers=3;
 
 % define date_when the run starts
 date_var = datestr(datetime('today'));
@@ -25,11 +25,11 @@ date_var = datestr(datetime('today'));
 %beta_matrix = zeros(length(sigma_list)*length(T_list)*2,2);
 
 %abs_dummy = 'True'; % or Abs
-%dist = 'norm';
+%dist = 'unif';
 %sorted = 'False';
  
 for sample_size_ind = 1:length(T_list)
-avg_bias_matrix = zeros(length(sigma_list)*2,4);
+avg_bias_matrix = zeros(length(sigma_list)*2,2);
 corr_matrix = zeros(length(sigma_list)*2,2);
 beta_matrix = zeros(length(sigma_list)*2,4);
 test_stat = zeros(length(sigma_list), reps);
@@ -42,7 +42,7 @@ for sigma_ind = 1:length(sigma_list)
 
 %alpha1 = 0.5;
 %alpha2 = 5;
-%alpha = (alpha1 + alpha2)/2;
+%alpha = (alpha1+alpha2)/2;
 beta  = 0.5;
 sigma = sigma_list(sigma_ind); % assign correlation between x and u
 %rand('seed',202101);
@@ -62,7 +62,7 @@ cov_matrix(:,1) = sigma;
 
 % diagonal of the covariance matrix includes ones
 for diag_i=(1:1:reps+1)
-    cov_matrix(diag_i,diag_i) = 1;
+    cov_matrix(diag_i,diag_i) = 5;
 end
 
 % select case uniform or normal DGP
@@ -72,7 +72,7 @@ if strcmp(dist,'unif')
     R = mvnrnd(mu,cov_matrix,T); % generate data
     x = R(:,1);
     x = normcdf(x);
-    x = unifinv(x,-10,10); %transform data to uniformly distributed data
+    x = unifinv(x,-10,20); %transform data to uniformly distributed data
 else
     % normal case
     cov_matrix(1,1) = 1;
@@ -86,9 +86,10 @@ end
 eps = R(:,2:end);
 
 % dependent variables, in each of the repetitions
-diff_alphas = unifrnd(-100,100,[T,]);
+rng('default')  % For reproducibility
+different_alphas = floor(unifrnd(-100,200,[T, reps]));
 
-y = beta*x
+y = different_alphas + beta*x + eps;
 
 % combine dependent and independent variables to a dataset
 xy = [x y];
@@ -101,9 +102,9 @@ x = xy(:,1);
 y = xy(:,2:reps+1);
 
 
-%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
 % OLS ESTIMATION %
-%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
 
 x_matr = [ones(T,1) x];  % this is matrix X in betahat = (X'X)^(-1)*(X'y)
 var_true = (sigma^2)*inv(x_matr'*x_matr);  % true variance-covariance matrix
@@ -127,9 +128,6 @@ while r < reps+0.5
         numerator = numerator + x_dev*y_dev;
         denominator = denominator + x_dev*x_dev;
     end;
-    
-   % betas beta_hat = (x-x_avg)'*(y-y_avg)./sum((x-x_avg).^2);
-   % alpha_hat = y_avg - beta_hat*x_avg;
     b_hat              = numerator/denominator;
     b_hat_all(2,r)     = b_hat;
     b_hat_all(1,r)     = y_avg_r - b_hat*x_avg;
@@ -142,8 +140,6 @@ end
 
 standard_dev1=std(b_hat_all(1,:));
 standard_dev2=std(b_hat_all(2,:));
-%ols_alpha = mean(b_hat_all(1,:));
-%ols_beta = mean(b_hat_all(2,:));
 
 mean_x_u_corr = mean(x_u_corr_all);
 stdev_x_u_corr = std(x_u_corr_all);
@@ -176,18 +172,18 @@ stdev_x_u_corr = std(x_u_corr_all);
 %corr_matrix((sigma_ind-1)*2+1,1) = mean_x_u_corr;
 %corr_matrix(sigma_ind*2,1) = stdev_x_u_corr;
 
-ols_avg_bias_alpha = mean(b_hat_all(1,:)-alpha);
-ols_avg_bias_beta = mean(b_hat_all(2,:)-beta);
+%ols_avg_bias_alpha = mean(b_hat_all(1,:)-alpha,2);
+ols_avg_bias_beta = mean(b_hat_all(2,:)-beta,2);
 
-ols_std_bias_alpha = std(b_hat_all(1,:)-alpha);
+%ols_std_bias_alpha = std(b_hat_all(1,:)-alpha);
 ols_std_bias_beta = std(b_hat_all(2,:)-beta);
 
 % bias
-avg_bias_matrix((sigma_ind-1)*2+1,3) = ols_avg_bias_alpha;
-avg_bias_matrix(sigma_ind*2,3) = ols_std_bias_alpha;
+%avg_bias_matrix((sigma_ind-1)*2+1,3) = ols_avg_bias_alpha;
+%avg_bias_matrix(sigma_ind*2,3) = ols_std_bias_alpha;
 
-avg_bias_matrix((sigma_ind-1)*2+1,4) = ols_avg_bias_beta;
-avg_bias_matrix(sigma_ind*2,4) = ols_std_bias_beta;
+avg_bias_matrix((sigma_ind-1)*2+1,2) = ols_avg_bias_beta;
+avg_bias_matrix(sigma_ind*2,2) = ols_std_bias_beta;
 
 % store coefficients
 beta_matrix((sigma_ind-1)*2+1,3) = mean(b_hat_all(1,:),2);
@@ -204,74 +200,48 @@ beta_matrix(sigma_ind*2,4) = standard_dev2;
 b_hat_all = zeros(2,reps);  % store estimated betahats, r-th repetition in r-th column
 x_u_corr_all = zeros(1,reps);
 
+% source table8_ approx
 r = 1;
 while r < reps+0.5
-    number_of_betas = T * (T-1) /2;
-    pairwise_betas = zeros(2,number_of_betas);
-    delta_y = zeros(1,number_of_betas);
-    delta_x = zeros(1,number_of_betas);
-    counter=1;
-
-    % iterate over all pairs
+    pairwise_betas=zeros(2,T-1);
+    
     for i=(1:1:T-1)
-        for j=((i+1):1:T)
-           % if i<j
-                % calculate x difference
-
-                if strcmp(abs_dummy, 'True')
-                    delta_x(1, counter) = abs(x(j,1) - x(i,1));
-                else
-                    delta_x(1, counter) = x(j,1) - x(i,1);
-                end
-                % calculate betahat
-                x_avg     = (x(i,1)+x(j,1))/2;
-                y_avg     = (y(i,r)+y(j,r))/2;
-                numerator = y(j,r) - y(i,r);
-                delta_y(1, counter) = numerator;
-                denominator = x(j,1) - x(i,1);
-                b_hat_i     = numerator/denominator;
-                alpha_hat_i = y_avg - b_hat_i*x_avg;
-                pairwise_betas(1,counter)=alpha_hat_i;
-                pairwise_betas(2,counter)=b_hat_i;
-                counter   = counter + 1;
-          %  end
-        end
+        % calculate betahat
+        x_avg     = mean(x(i:i+1));
+        y_avg     = mean(y(i:i+1, r));
+        numerator = y(i+1,r) - y(i,r);
+        denominator = x(i+1,1) - x(i,1);
+        b_hat_i     = numerator/denominator;
+        alpha_hat_i = y_avg - b_hat_i*x_avg;
+        pairwise_betas(1,i)=alpha_hat_i;
+        pairwise_betas(2,i)=b_hat_i;
     end
-
     % Obtain the delta-x weighted average of pairwise betas
-            
-    sum_delta_x = nansum(delta_x);
-    inf_index =(pairwise_betas==Inf);
-    minusinf_index = (pairwise_betas==-Inf);
-    sum_noninf = max(max(inf_index(1,:),inf_index(2,:)),max(minusinf_index(1,:),minusinf_index(2,:)));
-    %sum((inf_index+minusinf_index),1);
     
-    noninf_index = (1-sum_noninf)==1; 
-    
-    weighted_parwise_betas = pairwise_betas(:,noninf_index)*delta_x( noninf_index)';
-
+    delta_x = diff(x);
+    delta_x = abs(delta_x);
+    sum_delta_x = sum(delta_x);
+    weighted_parwise_betas = pairwise_betas*delta_x;
     weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_x;
+    
+    % Simple average for beta_0
+    pairwise_betas = sum(pairwise_betas,2)./(T-1);
+    b_hat_all(1,r)        = pairwise_betas(1);
     
     b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
+
+    r = r + 1;   
     
-    u_hat              = y(:,r) - b_hat_all(1,r) - b_hat_all(2,r)*x;
-    x_u_corr_all(1,r)  = corr(x, u_hat);
-    
-    % test stat
-    delta_u = delta_y - b_hat_all(2,r)*delta_x;
-    test_stat(sigma_ind, r) = (sum(delta_x.*(delta_x*(beta-b_hat_all(2,r))+delta_u))/(T_list(sample_size_ind)*(T_list(sample_size_ind)-1))*2);
-    
-    r = r + 1;
 end
 
 standard_dev1=std(b_hat_all(1,:));
 standard_dev2=std(b_hat_all(2,:));
 
-avg_bias_alpha = mean(b_hat_all(1,:)-alpha,2);
-avg_bias_beta = mean(b_hat_all(2,:)-beta,2);
+%avg_bias_alpha = mean(b_hat_all(1,:)-alpha);
+avg_bias_beta = mean(b_hat_all(2,:)-beta);
 
-std_bias_alpha = std(b_hat_all(1,:)-alpha);
+%std_bias_alpha = std(b_hat_all(1,:)-alpha);
 std_bias_beta = std(b_hat_all(2,:)-beta);
 
 mean_x_u_corr = mean(x_u_corr_all);
@@ -300,11 +270,10 @@ stdev_x_u_corr = std(x_u_corr_all);
 
 %bias
 %col 1 - alpha, col 2 - beta
-avg_bias_matrix((sigma_ind-1)*2+1,1) = avg_bias_alpha;
-avg_bias_matrix(sigma_ind*2,1) = std_bias_alpha;
-
-avg_bias_matrix((sigma_ind-1)*2+1,2) = avg_bias_beta;
-avg_bias_matrix(sigma_ind*2,2) = std_bias_beta;
+%avg_bias_matrix((sigma_ind-1)*2+1,1) = avg_bias_alpha;
+%avg_bias_matrix(sigma_ind*2,1) = std_bias_alpha;
+avg_bias_matrix((sigma_ind-1)*2+1,1) = avg_bias_beta;
+avg_bias_matrix(sigma_ind*2,1) = std_bias_beta;
 
 beta_matrix((sigma_ind-1)*2+1,1) = nanmean(b_hat_all(1,:),2);
 beta_matrix((sigma_ind-1)*2+1,2) = nanmean(b_hat_all(2,:),2);
@@ -324,29 +293,29 @@ else
     sorted_text = '';
 end
 
-if strcmp(abs_dummy,'True')==1
+if strcmp(abs_dummy,'True')
     if strcmp(dist,'norm')
-        beta_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_beta_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %corr_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_corr_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %tstat_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_tstat_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        bias_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_bias_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        beta_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Norm_beta_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %corr_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Norm_corr_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %tstat_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Norm_tstat_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        bias_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Norm_bias_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
     else
-        beta_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_beta_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %corr_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_corr_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %tstat_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_tstat_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');  
-        bias_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_bias_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');  
+        beta_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Unif_beta_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %corr_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Unif_corr_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %tstat_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Unif_tstat_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');  
+        bias_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Unif_bias_Abs_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');  
     end 
 else
     if strcmp(dist,'norm')
-        beta_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_beta_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %corr_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_corr_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %tstat_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_tstat_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        bias_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Norm_bias_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        beta_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Norm_beta_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %corr_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Norm_corr_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %tstat_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Norm_tstat_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        bias_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Norm_bias_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
     else
-        beta_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_beta_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %corr_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_corr_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
-        %tstat_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_tstat_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');  
-        bias_title = strcat('Results/usual_suspects_fullpairwise',sorted_text,'_Unif_bias_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');  
+        beta_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Unif_beta_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %corr_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Unif_corr_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');
+        %tstat_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Unif_tstat_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');  
+        bias_title = strcat('Results/usual_suspects_nonsorted_adjacent_different_alphas',sorted_text,'_Unif_bias_deltax_T_',num2str(T_list(sample_size_ind)),'_',date_var,'.mat');  
     end
 end
 %Results/

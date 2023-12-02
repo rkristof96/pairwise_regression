@@ -62,7 +62,7 @@ cov_matrix(:,1) = sigma;
 
 % diagonal of the covariance matrix includes ones
 for diag_i=(1:1:reps+1)
-    cov_matrix(diag_i,diag_i) = 1;
+    cov_matrix(diag_i,diag_i) = 5;
 end
 
 % select case uniform or normal DGP
@@ -72,7 +72,7 @@ if strcmp(dist,'unif')
     R = mvnrnd(mu,cov_matrix,T); % generate data
     x = R(:,1);
     x = normcdf(x);
-    x = unifinv(x,-10,10); %transform data to uniformly distributed data
+    x = unifinv(x,-10,20); %transform data to uniformly distributed data
 else
     % normal case
     cov_matrix(1,1) = 1;
@@ -86,9 +86,9 @@ end
 eps = R(:,2:end);
 
 % dependent variables, in each of the repetitions
-different_alphas = unifrnd(-100,100,[T, reps]);
-
 rng('default')  % For reproducibility
+different_alphas = floor(unifrnd(-100,200,[T, reps]));
+
 y = different_alphas + beta*x + eps;
 
 % combine dependent and independent variables to a dataset
