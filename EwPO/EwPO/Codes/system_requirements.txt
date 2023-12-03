@@ -1,0 +1,12 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Matlab version and Toolboxes %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% You can use  >>ver('distcomp')<< command (without >><< symbols) to test your version
+----------------------------------------------------------------------------------------------------
+MATLAB Version: 9.1.0.441655 (R2016b)
+MATLAB License Number: 416517
+Operating System: Microsoft Windows 10 Pro Version 10.0 (Build 19045)
+Java Version: Java 1.7.0_60-b19 with Oracle Corporation Java HotSpot(TM) 64-Bit Server VM mixed mode
+----------------------------------------------------------------------------------------------------
+Parallel Computing Toolbox                            Version 6.9         (R2016b)
