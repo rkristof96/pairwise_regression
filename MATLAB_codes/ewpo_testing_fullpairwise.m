@@ -90,7 +90,8 @@ eps = R(:,2:end);
 if strcmp(version,'A')
 	u = sigma*eps.^2.*(x-(-0.5));
 else
-	u = sigma*eps*(x-(-0.5));
+	%u = sigma*eps*(x-(-0.5));
+    u = sigma*(x-(-0.5));
 end
 
 
