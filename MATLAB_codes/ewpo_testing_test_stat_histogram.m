@@ -19,7 +19,7 @@ abs = ''; %'_Abs';
 %%
 % (alpha_OLS-alpha_EWPO)
 % sample sizes
-sample_size_list = [10, 50, 100, 500, 500];
+sample_size_list = [10, 50, 100, 500, 1000];
 for index = 1:length(sample_size_list)
 filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_alpha_version_',version,abs,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
 %filename=sprintf('Unif_tstat_deltax_T_%d_09-Apr-2023',sample_size_list(index));
@@ -42,14 +42,14 @@ else
     weight_text = '|\Delta x|';
 end
 
-title_name = strcat('(\Alpha_OLS-\Alpha_EWPO) distribution, DGP = U(-2,3), estimator: full pairwise, ',sorted_text,' version ',version, weight_text);
+title_name = strcat('(\Alpha_OLS-\Alpha_EWPO) distribution, DGP = U(-2,3), estimator: full pairwise, ',sorted_text,' version: ',version,'  ', weight_text);
 title(title_name);
 %title(' distribution, DGP = U(-2,3), estimator: full pairwise, weights = \Delta x')
 % figure parameetrs
 x0=10;
 y0=10;
 width=750;
-height=500;
+height = 500;
 set(f,'position',[x0,y0,width,height])
 
 % corr(x,u) = 0
@@ -58,7 +58,7 @@ f(1)=subplot(2,2,1);
 hist(st.x(1,:))
 hold on;
 % add mean value
-line([mean(st.x(1,:)), mean(st.x(1,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(1,:)), mean(st.x(1,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(1),'\rho = 0')
 xlabel(f(1),'Value')
@@ -71,7 +71,7 @@ f(2)=subplot(2,2,2);
 hist(st.x(2,:))
 hold on;
 % add mean value
-line([mean(st.x(2,:)), mean(st.x(2,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(2,:)), mean(st.x(2,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(2),'\rho = 0.2')
 xlabel(f(2),'Value')
@@ -82,7 +82,7 @@ hold off;
 f(3)=subplot(2,2,3);
 hist(st.x(3,:))
 hold on;
-line([mean(st.x(3,:)), mean(st.x(3,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(3,:)), mean(st.x(3,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 title(f(3),'\rho = 0.5')
 xlabel(f(3),'Value')
 ylabel(f(3),'Frequency')
@@ -94,7 +94,7 @@ f(4)=subplot(2,2,4);
 hist(st.x(4,:))
 hold on;
 % add mean value
-line([mean(st.x(4,:)), mean(st.x(4,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(4,:)), mean(st.x(4,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(4),'\rho = 0.8')
 xlabel(f(4),'Value')
@@ -139,14 +139,14 @@ else
     weight_text = '|\Delta x|';
 end
 
-title_name = strcat('(\Alpha_OLS-\Alpha_EWPO)^2 distribution, DGP = U(-2,3), estimator: full pairwise, ',sorted_text,' version ',version, weight_text);
+title_name = strcat('(\Alpha_OLS-\Alpha_EWPO)^2 distribution, DGP = U(-2,3), estimator: full pairwise, ',sorted_text,' version ',version,'  ', weight_text);
 title(title_name);
 %title(' distribution, DGP = U(-2,3), estimator: full pairwise, weights = \Delta x')
 % figure parameetrs
 x0=10;
 y0=10;
 width=750;
-height=500;
+height = 500;
 set(f,'position',[x0,y0,width,height])
 
 % corr(x,u) = 0
@@ -155,7 +155,7 @@ f(1)=subplot(2,2,1);
 hist(st.x(1,:))
 hold on;
 % add mean value
-line([mean(st.x(1,:)), mean(st.x(1,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(1,:)), mean(st.x(1,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(1),'\rho = 0')
 xlabel(f(1),'Value')
@@ -168,7 +168,7 @@ f(2)=subplot(2,2,2);
 hist(st.x(2,:))
 hold on;
 % add mean value
-line([mean(st.x(2,:)), mean(st.x(2,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(2,:)), mean(st.x(2,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(2),'\rho = 0.2')
 xlabel(f(2),'Value')
@@ -179,7 +179,7 @@ hold off;
 f(3)=subplot(2,2,3);
 hist(st.x(3,:))
 hold on;
-line([mean(st.x(3,:)), mean(st.x(3,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(3,:)), mean(st.x(3,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 title(f(3),'\rho = 0.5')
 xlabel(f(3),'Value')
 ylabel(f(3),'Frequency')
@@ -191,7 +191,7 @@ f(4)=subplot(2,2,4);
 hist(st.x(4,:))
 hold on;
 % add mean value
-line([mean(st.x(4,:)), mean(st.x(4,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(4,:)), mean(st.x(4,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(4),'\rho = 0.8')
 xlabel(f(4),'Value')
@@ -236,14 +236,14 @@ else
     weight_text = '|\Delta x|';
 end
 
-title_name = strcat('(\Alpha_OLS-\Alpha_EWPO)^2 distribution, DGP = U(-2,3), estimator: full pairwise, ',sorted_text,' version ',version, weight_text);
+title_name = strcat('(\Alpha_OLS-\Alpha_EWPO)^2 distribution, DGP = U(-2,3), estimator: full pairwise, ',sorted_text,' version ',version,'  ', weight_text);
 title(title_name);
 %title(' distribution, DGP = U(-2,3), estimator: full pairwise, weights = \Delta x')
 % figure parameetrs
 x0=10;
 y0=10;
 width=750;
-height=500;
+height = 500;
 set(f,'position',[x0,y0,width,height])
 
 % corr(x,u) = 0
@@ -252,7 +252,7 @@ f(1)=subplot(2,2,1);
 hist(st.x(1,:))
 hold on;
 % add mean value
-line([mean(st.x(1,:)), mean(st.x(1,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(1,:)), mean(st.x(1,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(1),'\rho = 0')
 xlabel(f(1),'Value')
@@ -265,7 +265,7 @@ f(2)=subplot(2,2,2);
 hist(st.x(2,:))
 hold on;
 % add mean value
-line([mean(st.x(2,:)), mean(st.x(2,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(2,:)), mean(st.x(2,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(2),'\rho = 0.2')
 xlabel(f(2),'Value')
@@ -276,7 +276,7 @@ hold off;
 f(3)=subplot(2,2,3);
 hist(st.x(3,:))
 hold on;
-line([mean(st.x(3,:)), mean(st.x(3,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(3,:)), mean(st.x(3,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 title(f(3),'\rho = 0.5')
 xlabel(f(3),'Value')
 ylabel(f(3),'Frequency')
@@ -288,7 +288,7 @@ f(4)=subplot(2,2,4);
 hist(st.x(4,:))
 hold on;
 % add mean value
-line([mean(st.x(4,:)), mean(st.x(4,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(4,:)), mean(st.x(4,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(4),'\rho = 0.8')
 xlabel(f(4),'Value')
@@ -333,14 +333,14 @@ else
     weight_text = '|\Delta x|';
 end
 
-title_name = strcat('(\Alpha_OLS-\Alpha_EWPO)^2 distribution, DGP = U(-2,3), estimator: full pairwise, ',sorted_text,' version ',version, weight_text);
+title_name = strcat('(\Alpha_OLS-\Alpha_EWPO)^2 distribution, DGP = U(-2,3), estimator: full pairwise, ',sorted_text,' version ',version,'  ', weight_text);
 title(title_name);
 %title(' distribution, DGP = U(-2,3), estimator: full pairwise, weights = \Delta x')
 % figure parameetrs
 x0=10;
 y0=10;
 width=750;
-height=500;
+height = 500;
 set(f,'position',[x0,y0,width,height])
 
 % corr(x,u) = 0
@@ -349,7 +349,7 @@ f(1)=subplot(2,2,1);
 hist(st.x(1,:))
 hold on;
 % add mean value
-line([mean(st.x(1,:)), mean(st.x(1,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(1,:)), mean(st.x(1,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(1),'\rho = 0')
 xlabel(f(1),'Value')
@@ -362,7 +362,7 @@ f(2)=subplot(2,2,2);
 hist(st.x(2,:))
 hold on;
 % add mean value
-line([mean(st.x(2,:)), mean(st.x(2,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(2,:)), mean(st.x(2,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(2),'\rho = 0.2')
 xlabel(f(2),'Value')
@@ -373,7 +373,7 @@ hold off;
 f(3)=subplot(2,2,3);
 hist(st.x(3,:))
 hold on;
-line([mean(st.x(3,:)), mean(st.x(3,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(3,:)), mean(st.x(3,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 title(f(3),'\rho = 0.5')
 xlabel(f(3),'Value')
 ylabel(f(3),'Frequency')
@@ -385,7 +385,7 @@ f(4)=subplot(2,2,4);
 hist(st.x(4,:))
 hold on;
 % add mean value
-line([mean(st.x(4,:)), mean(st.x(4,:))], [0 500], 'LineWidth', 2, 'Color', 'r');
+line([mean(st.x(4,:)), mean(st.x(4,:))], [0 300], 'LineWidth', 2, 'Color', 'r');
 % add title and labels
 title(f(4),'\rho = 0.8')
 xlabel(f(4),'Value')
