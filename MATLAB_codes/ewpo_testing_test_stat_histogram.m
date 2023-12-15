@@ -12,16 +12,16 @@ clc
 %%
 % Uniform DGP
 
-req_date = '14-Dec-2023';
+req_date = '15-Dec-2023';
 sorted =  '_sorted';%''
-version = 'A';
-abs = ''; %'_Abs';
+version = 'B';
+abs_w = ''; %'_Abs';
 %%
 % (alpha_OLS-alpha_EWPO)
 % sample sizes
 sample_size_list = [10, 50, 100, 500, 1000];
 for index = 1:length(sample_size_list)
-filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_alpha_version_',version,abs,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
+filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_alpha_version_',version,abs_w,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
 %filename=sprintf('Unif_tstat_deltax_T_%d_09-Apr-2023',sample_size_list(index));
 % load uniform data
 st = load(['Results/',filename,'.mat']);
@@ -36,7 +36,7 @@ else
     sorted_text = '';
 end
 
-if strcmp(abs,'')
+if strcmp(abs_w,'')
     weight_text = '\Delta x';
 else
     weight_text = '|\Delta x|';
@@ -118,7 +118,7 @@ end
 %%
 % (alpha_OLS-alpha_EWPO)^2
 for index = 1:length(sample_size_list)
-filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_alpha2_version_',version,abs,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
+filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_alpha2_version_',version,abs_w,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
 %filename=sprintf('Unif_tstat_deltax_T_%d_09-Apr-2023',sample_size_list(index));
 % load uniform data
 st = load(['Results/',filename,'.mat']);
@@ -133,7 +133,7 @@ else
     sorted_text = '';
 end
 
-if strcmp(abs,'')
+if strcmp(abs_w,'')
     weight_text = '\Delta x';
 else
     weight_text = '|\Delta x|';
@@ -215,7 +215,7 @@ end
 %%
 % (beta_OLS-beta_EWPO)
 for index = 1:length(sample_size_list)
-filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_beta_version_',version,abs,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
+filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_beta_version_',version,abs_w,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
 %filename=sprintf('Unif_tstat_deltax_T_%d_09-Apr-2023',sample_size_list(index));
 % load uniform data
 st = load(['Results/',filename,'.mat']);
@@ -230,7 +230,7 @@ else
     sorted_text = '';
 end
 
-if strcmp(abs,'')
+if strcmp(abs_w,'')
     weight_text = '\Delta x';
 else
     weight_text = '|\Delta x|';
@@ -312,7 +312,7 @@ end
 %%
 % (beta_OLS-beta_EWPO)^2
 for index = 1:length(sample_size_list)
-filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_beta2_version_',version,abs,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
+filename = strcat('ewpo_testing_fullpairwise',sorted,'_Unif_diff_beta2_version_',version,abs_w,'_deltax_T_',num2str(sample_size_list(index)),'_',req_date);
 %filename=sprintf('Unif_tstat_deltax_T_%d_09-Apr-2023',sample_size_list(index));
 % load uniform data
 st = load(['Results/',filename,'.mat']);
@@ -327,7 +327,7 @@ else
     sorted_text = '';
 end
 
-if strcmp(abs,'')
+if strcmp(abs_w,'')
     weight_text = '\Delta x';
 else
     weight_text = '|\Delta x|';
