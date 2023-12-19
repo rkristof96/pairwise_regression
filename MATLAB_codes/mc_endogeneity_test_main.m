@@ -76,7 +76,7 @@ version = 'B';
 %Uniform
 T_list = [10, 50, 100, 500, 1000];
 %reload and combine data
-req_date ='18-Dec-2023';
+req_date ='19-Dec-2023';
 abs_beta_out =[];
 abs_diff_out =[];
 
@@ -85,13 +85,13 @@ noabs_beta_out =[];
 noabs_diff_out =[];
 
 for ss =1:length(T_list)
-
-    %abs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version_',version,'_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
-    %abs_diff_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_diff_matrix_version_',version,'_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+%{
+    abs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version_',version,'_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    abs_diff_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_diff_matrix_version_',version,'_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
     
     abs_beta_out = [abs_beta_out,abs_beta_add.x'];
     abs_diff_out = [abs_diff_out,abs_diff_add.x'];
-    
+    %}
     noabs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version_',version,'_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
     noabs_diff_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_diff_matrix_version_',version,'_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
     
