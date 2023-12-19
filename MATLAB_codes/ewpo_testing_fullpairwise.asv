@@ -47,7 +47,7 @@ for sigma_ind = 1:length(sigma_list)
 
 alpha = 1;
 beta  = 0.5;
-sigma = sigma_list(sigma_ind); % assign correlation between x and u
+sigma = sigma_list(sigma_ind) % assign correlation between x and u
 %rand('seed',202101);
 rand('seed',20230318);
 % generate x: (Tx1) u: (Txreps) vector of bi-variate normal distributed
@@ -348,10 +348,14 @@ diff_matrix(sigma_ind*2,4) = std((b_hat_all_ols(2,:)-b_hat_all(2,:)).^2);
 % sum
 diff_matrix(sigma_ind,5) = sum((b_hat_all_ols(1,:)-b_hat_all(1,:)));
 diff_matrix(sigma_ind,6) = sum((b_hat_all_ols(1,:)-b_hat_all(1,:)).^2);
-diff_matrix(sigma_ind,7) = sum((b_hat_all_ols(2,:)-b_hat_all(2,:)));
-diff_matrix(sigma_ind,8) = sum((b_hat_all_ols(2,:)-b_hat_all(2,:)).^2);
+diff_matrix(sigma_ind,7) = sum(diff_beta(sigma_ind,:));
+diff_matrix(sigma_ind,8) = sum(diff_beta2(sigma_ind,:));
 
-
+% sum of squared
+diff_matrix(4+sigma_ind,5) = sum((b_hat_all_ols(1,:)-b_hat_all(1,:)).^2);
+diff_matrix(4+sigma_ind,6) = sum(diff_alpha2(sigma_ind,:).^2);
+diff_matrix(4+sigma_ind,7) = sum(diff_beta(sigma_ind,:).^2);
+diff_matrix(4+sigma_ind,8) = sum(diff_beta2(sigma_ind,:).^2);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
