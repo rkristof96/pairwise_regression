@@ -323,9 +323,6 @@ end
 beta_matrix(sigma_ind*2,1) = standard_dev1;
 beta_matrix(sigma_ind*2,2) = standard_dev2;
 
-end
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% calculate test statistics %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -351,8 +348,7 @@ diff_matrix(sigma_ind,6) = sum((b_hat_all_ols(1,:)-b_hat_all(1,:)).^2);
 diff_matrix(sigma_ind,7) = sum((b_hat_all_ols(2,:)-b_hat_all(2,:)));
 diff_matrix(sigma_ind,8) = sum((b_hat_all_ols(2,:)-b_hat_all(2,:)).^2);
 
-
-
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if strcmp(sorted,'True') 
