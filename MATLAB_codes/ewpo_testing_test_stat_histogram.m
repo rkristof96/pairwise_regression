@@ -13,9 +13,9 @@ clc
 % Uniform DGP
 
 req_date = '22-Dec-2023';
-sorted = '';%
-%sorted = '_sorted';%''
-version = 'B';
+%sorted = '';%
+sorted = '_sorted';%''
+version = 'A';
 abs_w = '';
 %abs_w = '_Abs'; 
 %%
