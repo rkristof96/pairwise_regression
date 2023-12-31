@@ -16,7 +16,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations ;50,500,5000
+T = 50; % number of observations ;50,500,5000
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -125,8 +125,6 @@ while r < reps+0.5
                 % calculate x difference
                 delta_x(1, counter) = x(j,1) - x(i,1);
                 % calculate betahat
-                %numerator = y(j,r) - y(i,r);
-                %denominator = x(j,1) - x(i,1);
                 y_avg     = (x(i,1)+x(j,1))/2;
                 x_avg     = (y(i,r)+y(j,r))/2;         
                 denominator = y(j,r) - y(i,r);
