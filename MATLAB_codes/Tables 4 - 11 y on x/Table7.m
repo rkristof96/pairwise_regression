@@ -71,8 +71,8 @@ while r < reps+0.5
     numerator = 0;
     denominator = 0;
     for i=(1:1:T)
-        x_dev = x(i,1)-x_avg;
-        y_dev = y(i,r)-y_avg_r;
+        y_dev = x(i,1)-x_avg;
+        x_dev = y(i,r)-y_avg_r;
         numerator = numerator + x_dev*y_dev;
         denominator = denominator + x_dev*x_dev;
     end;
@@ -130,8 +130,10 @@ while r < reps+0.5
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
                 y_avg     = (y(i,r)+y(j,r))/2;
-                numerator = y(j,r) - y(i,r);
-                denominator = x(j,1) - x(i,1);
+                %numerator = y(j,r) - y(i,r);
+                %denominator = x(j,1) - x(i,1);
+                denominator = y(j,r) - y(i,r);
+                numerator = x(j,1) - x(i,1);
                 b_hat_i     = numerator/denominator;
                 alpha_hat_i = y_avg - b_hat_i*x_avg;
                 pairwise_betas(1,counter)=alpha_hat_i;
