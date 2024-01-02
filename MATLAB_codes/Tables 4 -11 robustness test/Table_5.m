@@ -5,7 +5,7 @@ clc;
 % true parameters
 
 alpha = 1;
-beta  = 1.5;
+beta  = 0.5;
 sigma = 1;
 xi = -sqrt(2/pi);
 
