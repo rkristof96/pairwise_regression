@@ -6,13 +6,13 @@ clc;
 
 
 alpha = 1;
-beta  = 1.5;
+beta  = 0.5;
 sigma = 1;
 xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -32,11 +32,11 @@ U_eps_outliers = U_eps;
 num_outliers = ceil(T/100);
 
 for i = 1:reps
-   [Bsort Bidx] = getNElements(U_eps(:,1), num_outliers);
-   U_eps_outliers(Bidx,i) = U_eps_outliers(Bidx,i)*10
+   [Bsort Bidx] = getNElements(U_eps(:,i), num_outliers);
+   U_eps_outliers(Bidx,i) = U_eps_outliers(Bidx,i)*10;
 end
 
-eps = xi + tau_eps + U_eps_outliers;
+eps = xi*0 + tau_eps*0 + U_eps_outliers;
     
 % dependent variables, in each of the repetitions
 
