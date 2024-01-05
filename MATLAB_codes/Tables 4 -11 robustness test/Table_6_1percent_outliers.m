@@ -12,7 +12,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 5000; % number of observations
+T = 50; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -38,12 +38,18 @@ randn('seed',202101);
 Z_eps = normrnd(0,1, [T,reps]);
 tau_eps = abs(Z_eps);
 rand('seed',222022);
-U_eps = trnd(2, [T,reps]);
-eps = 0*xi + 0*tau_eps + U_eps;
+U_eps = normrnd(0,1, [T,reps]);
+% generate outliers
+% 1% of the error terms are multiplied by 10
+U_eps_outliers = U_eps;
+num_outliers = ceil(T/100);
 
-fprintf('\nOutliers outside 3 std\n');
-fprintf(':%8.4f',sum(sum(abs(U_eps)>3*std(U_eps))/reps));
-    
+for i = 1:reps
+   [Bsort Bidx] = getNElements(U_eps(:,1), num_outliers);
+   U_eps_outliers(Bidx,i) = U_eps_outliers(Bidx,i)*10;
+end
+
+eps = xi + tau_eps + U_eps_outliers;
     
 % dependent variables, in each of the repetitions
 
@@ -110,6 +116,7 @@ fprintf('  Beta:%8.4f\n',mean(b_hat_all(2,:),2));
 fprintf('Standard errors (standard deviation of estimates at Monte Carlo repetitions)\n');
 fprintf('Alpha:%8.4f',standard_dev1);
 fprintf('  Beta:%8.4f',standard_dev2);
+
 
 %%%%%%%%%%%%%%
 % ADJACENT PAIRWISE ESTIMATION (WITHOUT CONNECTING FIRST AND LAST) %

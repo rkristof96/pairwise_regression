@@ -26,9 +26,12 @@ randn('seed',202101);
 Z_eps = normrnd(0,1, [T,reps]);
 tau_eps = abs(Z_eps);
 rand('seed',222022);
-U_eps = trnd(5, [T,reps]);
+U_eps = trnd(2, [T,reps]);
 eps = xi + tau_eps + U_eps;
-    
+
+fprintf('\nOutliers outside 3 std\n');
+fprintf(':%8.4f',sum(sum(abs(U_eps)>3*std(U_eps))/reps));
+
 % dependent variables, in each of the repetitions
 
 y = alpha+beta*x+eps;  % (T x reps) matrix of dependent variables

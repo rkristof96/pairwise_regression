@@ -12,7 +12,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -25,11 +25,12 @@ randn('seed',202101);
 Z_eps = normrnd(0,1, [T,reps]);
 tau_eps = abs(Z_eps);
 rand('seed',222022);
-U_eps = trnd(5, [T,reps]);
-eps = xi + tau_eps + U_eps;
+U_eps = trnd(2, [T,reps]);
+eps = 0*xi + 0*tau_eps + U_eps;
 
 fprintf('\nOutliers outside 3 std\n');
 fprintf(':%8.4f',sum(sum(abs(U_eps)>3*std(U_eps))/reps));
+    
     
 % dependent variables, in each of the repetitions
 
@@ -109,8 +110,6 @@ while r < reps+0.5
     number_of_betas = T * (T-1) /2;
     pairwise_betas = zeros(2,number_of_betas);
     delta_x = zeros(1,number_of_betas);
-    delta_y = zeros(1,number_of_betas);
-    length = zeros(1,number_of_betas);
     counter=1;
 
     % iterate over all pairs
@@ -119,8 +118,6 @@ while r < reps+0.5
             if i<j
                 % calculate x difference
                 delta_x(1, counter) = x(j,1) - x(i,1);
-                delta_y(1, counter) = y(j,r) - y(j,r);
-                length(1, counter) = sqrt(delta_x(1, counter)^2 + delta_y(1, counter)^2);
                 % calculate betahat
                 x_avg     = (x(i,1)+x(j,1))/2;
                 y_avg     = (y(i,r)+y(j,r))/2;
@@ -135,16 +132,24 @@ while r < reps+0.5
         end
     end
 
-    % Obtain the length weighted average of pairwise betas
+    % Obtain the delta-x weighted average of pairwise betas
     
-    inv_length = 1./length;
-    
-    sum_length = sum(length);
-    sum_inv_length = sum(inv_length);
-    weighted_parwise_betas = pairwise_betas*length';
-    weighted_average_parwise_betas = weighted_parwise_betas./sum_length;
+    %delta_x = abs(delta_x);
+    sum_delta_x = sum(delta_x);
+    weighted_parwise_betas = pairwise_betas*delta_x';
+    weighted_average_parwise_betas = weighted_parwise_betas./sum_delta_x;
+    %weighted_average_parwise_betas = weighted_parwise_betas./number_of_betas;
 
-    % weighted estimators
+    %inv_delta_x = 1./delta_x;
+    %sum_inv_delta_x = sum(inv_delta_x);
+    %weighted_parwise_betas = pairwise_betas*inv_delta_x';
+    %weighted_average_parwise_betas = weighted_parwise_betas./sum_inv_delta_x;
+    %weighted_average_parwise_betas = weighted_parwise_betas./(T-1);
+    
+    % Simple average for beta_0
+    %pairwise_betas = sum(pairwise_betas,2)./number_of_betas;
+    %b_hat_all(1,r)        = pairwise_betas(1);    
+    
     b_hat_all(1,r)        = weighted_average_parwise_betas(1);
     b_hat_all(2,r)        = weighted_average_parwise_betas(2);
     

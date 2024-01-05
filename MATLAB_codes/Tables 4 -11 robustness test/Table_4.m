@@ -11,7 +11,7 @@ xi = -sqrt(2/pi);
 
 b_true = [alpha;beta;sigma];
 
-T = 50; % number of observations
+T = 5000; % number of observations
 reps = 1000; % number of Monte Carlo repetitions
 
 % explanatory variable
@@ -31,8 +31,11 @@ randn('seed',202101);
 Z_eps = normrnd(0,1, [T,reps]);
 tau_eps = abs(Z_eps);
 rand('seed',222022);
-U_eps = trnd(5, [T,reps]);
+U_eps = trnd(2, [T,reps]);
 eps = xi + tau_eps + U_eps;
+
+fprintf('\nOutliers outside 3 std\n');
+fprintf(':%8.4f',sum(sum(abs(U_eps)>3*std(U_eps))/reps));
     
 % dependent variables, in each of the repetitions
 
