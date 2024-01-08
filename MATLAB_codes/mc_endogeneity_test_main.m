@@ -90,9 +90,9 @@ run('ewpo_testing_fullpairwise')
 
 %sorted = '';
 %sorted = '_sorted';
-version = 'A';
+%version = 'A';
 %version = 'B';
-%version = 'C';
+version = 'C';
 
 
 %%%%%%%%%
