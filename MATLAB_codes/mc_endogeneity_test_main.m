@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+C:\Users\Kristof\Desktop\Endogeneity\MATLAB_codes%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %prepare WD
 clear all
@@ -115,6 +115,8 @@ writetable(abs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwise'
 
 writetable(noabs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version',version,'_deltax_', req_date,'.xlsx'))
 writetable(noabs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_diff_version',version,'_deltax_', req_date,'.xlsx'))
+%%
+
 %%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
