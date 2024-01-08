@@ -16,7 +16,11 @@ date_var = datestr(datetime('today'));
  % correlation between x and u
  sigma_list = [0,0.2,0.5,0.8];
  % correlations between residuals used to generate the data
- cov_list = [0,0,0,0];%[0,0.0391,0.2493,0.6397];
+ if strcmp(version,'C')
+    cov_list = [0,0.0391,0.2493,0.6397];
+ else
+    cov_list = [0,0,0,0];
+ end
  
  reps = 1000;
 
@@ -59,8 +63,8 @@ cov_matrix = zeros(reps+1);
 % necessary for the data generation
 cov_matrix(:,:) = cov_list(sigma_ind); 
 % first row and column from the covariance matrix includes the correlation
-%cov_matrix(1,:) = 0;%sigma;
-%cov_matrix(:,1) = 0;%sigma;
+cov_matrix(1,:) = sigma;
+cov_matrix(:,1) = sigma;
 
 % diagonal of the covariance matrix includes ones
 for diag_i=(1:1:reps+1)
@@ -104,14 +108,14 @@ if strcmp(version,'B')
 	u = sigma*(x-(-0.5))+eps;
     %u = sigma*(x-(-0.5));
 end
+
 if strcmp(version,'C')
     % eps is not necessarily uncorrelated with x, if sigma is non-zero
     % v is uncorrelated with x
     v = normrnd(0,1,[T, reps]);
 	u = eps + v;
 end
-
-
+% regression equation
 y = alpha + beta*x + u;
 
 % combine dependent and independent variables to a dataset

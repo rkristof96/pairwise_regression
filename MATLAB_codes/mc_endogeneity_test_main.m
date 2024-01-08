@@ -61,12 +61,38 @@ dist = 'unif';
 sorted = 'True';
 version = 'B';
 run('ewpo_testing_fullpairwise')
+%%% version = 'C';
+% case 1
+abs_dummy = 'False'; 
+dist = 'student-t';
+sorted = 'True';
+version = 'C';
+run('ewpo_testing_fullpairwise')
+% case 2
+abs_dummy = 'False'; 
+dist = 'student-t';
+sorted = 'False';
+version = 'C';
+run('ewpo_testing_fullpairwise')
+% case 3
+abs_dummy = 'True'; 
+dist = 'student-t';
+sorted = 'False';
+version = 'C';
+run('ewpo_testing_fullpairwise')
+% case 4
+abs_dummy = 'True'; 
+dist = 'student-t';
+sorted = 'True';
+version = 'C';
+run('ewpo_testing_fullpairwise')
 
 
 %sorted = '';
 %sorted = '_sorted';
 version = 'A';
 %version = 'B';
+%version = 'C';
 
 
 %%%%%%%%%
@@ -115,7 +141,7 @@ writetable(abs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwise'
 
 writetable(noabs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version',version,'_deltax_', req_date,'.xlsx'))
 writetable(noabs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_diff_version',version,'_deltax_', req_date,'.xlsx'))
-%%
+
 
 %%
 
