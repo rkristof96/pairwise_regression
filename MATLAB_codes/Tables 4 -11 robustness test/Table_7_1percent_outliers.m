@@ -33,6 +33,7 @@ num_outliers = ceil(T/100);
 
 for i = 1:reps
    [Bsort Bidx] = getNElements(U_eps(:,i), num_outliers);
+   %[Bsort Bidx] = getNElements_abs(U_eps(:,i), num_outliers);
    U_eps_outliers(Bidx,i) = U_eps_outliers(Bidx,i)*10;
 end
 
