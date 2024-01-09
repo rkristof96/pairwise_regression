@@ -88,7 +88,7 @@ version = 'C';
 run('ewpo_testing_fullpairwise')
 
 
-sorted = '';
+%sorted = '';
 %sorted = '_sorted';
 %version = 'A';
 %version = 'B';

@@ -12,12 +12,12 @@ clc
 %%
 % Uniform DGP
 
-req_date = '22-Dec-2023';
-%sorted = '';%
-sorted = '_sorted';%''
-version = 'A';
-abs_w = '';
-%abs_w = '_Abs'; 
+req_date = '08-Jan-2024';
+sorted = '';%
+%sorted = '_sorted';%''
+version = 'C';
+%abs_w = '';
+abs_w = '_Abs'; 
 %%
 % (alpha_OLS-alpha_EWPO)
 % sample sizes
