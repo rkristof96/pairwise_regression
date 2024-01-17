@@ -180,42 +180,106 @@ T_list = [10, 50, 100, 500, 1000];
 req_date ='17-Jan-2024';
 abs_beta_out =[];
 abs_beta_corrected_out =[];
+abs_beta_ols_out = [];
+abs_beta_ewpo_out = [];
+abs_beta_ols_corrected_out = [];
+abs_beta_ewpo_corrected_out = [];
+abs_ols_correction_out = [];
+abs_ewpo_correction_out = [];
 
 
 %noabs_beta_out =[];
 %noabs_beta_corrected_out =[];
+%noabs_beta_ols_out = [];
+%noabs_beta_ewpo_out = [];
+%noabs_beta_ols_corrected_out = [];
+%noabs_beta_ewpo_corrected_out = [];
+%noabs_ols_correction_out = [];
+%noabs_ewpo_correction_out = [];
 
 for ss =1:length(T_list)
 
     abs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
     abs_beta_corrected_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_ols_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_ewpo_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_ols_corrected_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_corrected_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_ewpo_corrected_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_corrected_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_ols_correction_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_ols_correction_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_ewpo_correction_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_ewpo_correction_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
     
     abs_beta_out = [abs_beta_out,abs_beta_add.x'];
     abs_beta_corrected_out = [abs_beta_corrected_out,abs_beta_corrected_add.x'];
-%{
+    abs_beta_ols_out = [abs_beta_ols_out,abs_betaols_out_add.x'];
+    abs_beta_ewpo_out = [abs_beta_ewpo_out,abs_beta_ewpo_out_add.x'];
+    abs_beta_ols_corrected_out = [abs_beta_ols_corrected_out,abs_beta_ols_corrected_out_add.x'];
+    abs_beta_ewpo_corrected_out = [abs_beta_ewpo_corrected_out,abs_beta_ewpo_corrected_out_add.x'];
+    abs_ols_correction_out = [abs_ols_correction_out,abs_ols_correction_out_add.x'];
+    abs_ewpo_correction_out = [abs_ewpo_correction_out,abs_ewpo_correction_out_add.x'];
+
+    %{
     noabs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
     noabs_beta_corrected_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_ols_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_ewpo_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_ols_corrected_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_corrected_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_ewpo_corrected_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_corrected_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_ols_correction_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_ols_correction_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_ewpo_correction_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_ewpo_correction_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+   
     
     noabs_beta_out = [noabs_beta_out,noabs_beta_add.x'];
     noabs_beta_corrected_out = [noabs_beta_corrected_out,noabs_beta_corrected_add.x'];
+    noabs_beta_ols_out = [noabs_beta_ols_out,noabs_betaols_out_add.x'];
+    noabs_beta_ewpo_out = [noabs_beta_ewpo_out,noabs_beta_ewpo_out_add.x'];
+    noabs_beta_ols_corrected_out = [noabs_beta_ols_corrected_out,noabs_beta_ols_corrected_out_add.x'];
+    noabs_beta_ewpo_corrected_out = [noabs_beta_ewpo_corrected_out,noabs_beta_ewpo_corrected_out_add.x'];
+    noabs_ols_correction_out = [noabs_ols_correction_out,noabs_ols_correction_out_add.x'];
+    noabs_ewpo_correction_out = [noabs_ewpo_correction_out,noabs_ewpo_correction_out_add.x'];
 %}
 end
 
 
 abs_data_table_beta = table(abs_beta_out');
 abs_data_table_beta_corrected = table(abs_beta_corrected_out');
+abs_data_table_beta_ols = table(abs_beta_ols_out');
+abs_data_table_beta_ewpo = table(abs_beta_ewpo_out');
+abs_data_table_beta_ols_corrected = table(abs_beta_ols_corrected_out');
+abs_data_table_beta_ewpo_corrected = table(abs_beta_ewpo_corrected_out');
+abs_data_table_ols_correction = table(abs_ols_correction_out');
+abs_data_table_ewpo_correction = table(abs_ewpo_correction_out');
 
-
-%noabs_data_table_beta = table(noabs_beta_out');
-%noabs_data_table_beta_corrected = table(noabs_beta_corrected_out');
-
+%{
+noabs_data_table_beta = table(noabs_beta_out');
+noabs_data_table_beta_corrected = table(noabs_beta_corrected_out');
+noabs_data_table_beta_ols = table(noabs_beta_ols_out');
+noabs_data_table_beta_ewpo = table(noabs_beta_ewpo_out');
+noabs_data_table_beta_ols_corrected = table(noabs_beta_ols_corrected_out');
+noabs_data_table_beta_ewpo_corrected = table(noabs_beta_ewpo_corrected_out');
+noabs_data_table_ols_correction = table(noabs_ols_correction_out');
+noabs_data_table_ewpo_correction = table(noabs_ewpo_correction_out');
+%}
 
 % % write output
-writetable(abs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_version',version,'_Abs_deltax_', req_date,'.xlsx'))
-writetable(abs_data_table_beta_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_version',version,'_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_ols,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_ewpo,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_ols_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_corrected_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_ewpo_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_corrected_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_ols_correction,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_correction_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_ewpo_correction,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_correction_Abs_deltax_', req_date,'.xlsx'))
 
-%writetable(noabs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_version',version,'_deltax_', req_date,'.xlsx'))
-%writetable(noabs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_version',version,'_deltax_', req_date,'.xlsx'))
+%{
+writetable(noabs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_ols,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_ewpo,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_ols_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_corrected_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_ewpo_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_corrected_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_ols_correction,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ols_correction_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_ewpo_correction,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_ewpo_correction_deltax_', req_date,'.xlsx'))
+%}
 
 %%%%%%%%%%%%%
 % Student-t %
@@ -227,38 +291,103 @@ T_list = [10, 50, 100, 500, 1000];
 req_date ='17-Jan-2024';
 abs_beta_out =[];
 abs_beta_corrected_out =[];
+abs_beta_ols_out = [];
+abs_beta_ewpo_out = [];
+abs_beta_ols_corrected_out = [];
+abs_beta_ewpo_corrected_out = [];
+abs_ols_correction_out = [];
+abs_ewpo_correction_out = [];
+
 
 %noabs_beta_out =[];
 %noabs_beta_corrected_out =[];
+%noabs_beta_ols_out = [];
+%noabs_beta_ewpo_out = [];
+%noabs_beta_ols_corrected_out = [];
+%noabs_beta_ewpo_corrected_out = [];
+%noabs_ols_correction_out = [];
+%noabs_ewpo_correction_out = [];
 
 for ss =1:length(T_list)
 
-    abs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
-    abs_beta_corrected_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_corrected_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_corrected_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_ols_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_ewpo_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_ols_corrected_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_corrected_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_beta_ewpo_corrected_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_corrected_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_ols_correction_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_ols_correction_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    abs_ewpo_correction_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_ewpo_correction_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
     
     abs_beta_out = [abs_beta_out,abs_beta_add.x'];
     abs_beta_corrected_out = [abs_beta_corrected_out,abs_beta_corrected_add.x'];
+    abs_beta_ols_out = [abs_beta_ols_out,abs_betaols_out_add.x'];
+    abs_beta_ewpo_out = [abs_beta_ewpo_out,abs_beta_ewpo_out_add.x'];
+    abs_beta_ols_corrected_out = [abs_beta_ols_corrected_out,abs_beta_ols_corrected_out_add.x'];
+    abs_beta_ewpo_corrected_out = [abs_beta_ewpo_corrected_out,abs_beta_ewpo_corrected_out_add.x'];
+    abs_ols_correction_out = [abs_ols_correction_out,abs_ols_correction_out_add.x'];
+    abs_ewpo_correction_out = [abs_ewpo_correction_out,abs_ewpo_correction_out_add.x'];
 
     %{
-    noabs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
-    noabs_beta_corrected_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_corrected_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_corrected_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_ols_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_ewpo_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_ols_corrected_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_corrected_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_beta_ewpo_corrected_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_corrected_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_ols_correction_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_ols_correction_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+    noabs_ewpo_correction_out = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Student-t_ewpo_correction_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
+   
     
     noabs_beta_out = [noabs_beta_out,noabs_beta_add.x'];
     noabs_beta_corrected_out = [noabs_beta_corrected_out,noabs_beta_corrected_add.x'];
+    noabs_beta_ols_out = [noabs_beta_ols_out,noabs_betaols_out_add.x'];
+    noabs_beta_ewpo_out = [noabs_beta_ewpo_out,noabs_beta_ewpo_out_add.x'];
+    noabs_beta_ols_corrected_out = [noabs_beta_ols_corrected_out,noabs_beta_ols_corrected_out_add.x'];
+    noabs_beta_ewpo_corrected_out = [noabs_beta_ewpo_corrected_out,noabs_beta_ewpo_corrected_out_add.x'];
+    noabs_ols_correction_out = [noabs_ols_correction_out,noabs_ols_correction_out_add.x'];
+    noabs_ewpo_correction_out = [noabs_ewpo_correction_out,noabs_ewpo_correction_out_add.x'];
 %}
 end
 
 
 abs_data_table_beta = table(abs_beta_out');
 abs_data_table_beta_corrected = table(abs_beta_corrected_out');
+abs_data_table_beta_ols = table(abs_beta_ols_out');
+abs_data_table_beta_ewpo = table(abs_beta_ewpo_out');
+abs_data_table_beta_ols_corrected = table(abs_beta_ols_corrected_out');
+abs_data_table_beta_ewpo_corrected = table(abs_beta_ewpo_corrected_out');
+abs_data_table_ols_correction = table(abs_ols_correction_out');
+abs_data_table_ewpo_correction = table(abs_ewpo_correction_out');
 
-%noabs_data_table_beta = table(noabs_beta_out');
-%noabs_data_table_beta_corrected = table(noabs_beta_corrected_out');
+%{
+noabs_data_table_beta = table(noabs_beta_out');
+noabs_data_table_beta_corrected = table(noabs_beta_corrected_out');
+noabs_data_table_beta_ols = table(noabs_beta_ols_out');
+noabs_data_table_beta_ewpo = table(noabs_beta_ewpo_out');
+noabs_data_table_beta_ols_corrected = table(noabs_beta_ols_corrected_out');
+noabs_data_table_beta_ewpo_corrected = table(noabs_beta_ewpo_corrected_out');
+noabs_data_table_ols_correction = table(noabs_ols_correction_out');
+noabs_data_table_ewpo_correction = table(noabs_ewpo_correction_out');
+%}
 
 % % write output
-writetable(abs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_version',version,'_Abs_deltax_', req_date,'.xlsx'))
-writetable(abs_data_table_beta_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_version',version,'_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_corrected_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_ols,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_ewpo,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_ols_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_corrected_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_beta_ewpo_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_corrected_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_ols_correction,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_correction_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_ewpo_correction,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_correction_Abs_deltax_', req_date,'.xlsx'))
 
-%writetable(noabs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_version',version,'_deltax_', req_date,'.xlsx'))
-%writetable(noabs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_version',version,'_deltax_', req_date,'.xlsx'))
-
+%{
+writetable(noabs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_corrected_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_ols,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_ewpo,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_ols_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_corrected_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_beta_ewpo_corrected,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_corrected_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_ols_correction,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ols_correction_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_ewpo_correction,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Student-t_beta_ewpo_correction_deltax_', req_date,'.xlsx'))
+%}
