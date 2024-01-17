@@ -178,27 +178,27 @@ run('ewpo_testing_2estimators_fullpairwise')
 T_list = [10, 50, 100, 500, 1000];
 %reload and combine data
 req_date ='17-Jan-2024';
-abs_beta_out =[];
-abs_beta_corrected_out =[];
+%abs_beta_out =[];
+%abs_beta_corrected_out =[];
 
 
-%noabs_beta_out =[];
-%noabs_beta_corrected_out =[];
+noabs_beta_out =[];
+noabs_beta_corrected_out =[];
 
 for ss =1:length(T_list)
-
+%{
     abs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
     abs_beta_corrected_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_Abs_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
     
     abs_beta_out = [abs_beta_out,abs_beta_add.x'];
     abs_beta_corrected_out = [abs_beta_corrected_out,abs_beta_corrected_add.x'];
-%{
+   %}
     noabs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
     noabs_beta_corrected_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Norm_beta_corrected_deltax_T_',num2str(T_list(ss)),'_',req_var,'.mat'));
     
     noabs_beta_out = [noabs_beta_out,noabs_beta_add.x'];
     noabs_beta_corrected_out = [noabs_beta_corrected_out,noabs_beta_corrected_add.x'];
-%}
+
 end
 
 
@@ -206,8 +206,8 @@ abs_data_table_beta = table(abs_beta_out');
 abs_data_table_beta_corrected = table(abs_beta_corrected_out');
 
 
-%noabs_data_table_beta = table(noabs_beta_out');
-%noabs_data_table_beta_corrected = table(noabs_beta_corrected_out');
+noabs_data_table_beta = table(noabs_beta_out');
+noabs_data_table_beta_corrected = table(noabs_beta_corrected_out');
 
 
 % % write output
@@ -228,8 +228,9 @@ req_date ='17-Jan-2024';
 abs_beta_out =[];
 abs_beta_corrected_out =[];
 
-%noabs_beta_out =[];
-%noabs_beta_corrected_out =[];
+
+noabs_beta_out =[];
+noabs_beta_corrected_out =[];
 
 for ss =1:length(T_list)
 
