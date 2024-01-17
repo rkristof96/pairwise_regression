@@ -252,7 +252,7 @@ while r < reps+0.5
 
     % Obtain the delta-x weighted average of pairwise betas
     
-    mu_abs_delta_x(1,r) = namean(delta_x);
+    mu_abs_delta_x(1,r) = nanmean(delta_x);
             
     sum_delta_x = nansum(delta_x);
     inf_index =(pairwise_betas==Inf);
@@ -320,7 +320,7 @@ beta_matrix(sigma_ind*2,2) = standard_dev2;
 %%% calculate test statistics %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-sigma_ux_hat = var_x * (1 - 1./mu_abs_delta_x*sqrt(2/pi).^(-1).*(b_hat_all_ols(2,:)-b_hat_all(2,:));
+sigma_ux_hat = var_x * (1 - 1./mu_abs_delta_x*sqrt(2/pi)).^(-1).*(b_hat_all_ols(2,:)-b_hat_all(2,:));
 tau_xu_hat = sigma_ux_hat./var_x.*sqrt(2/pi);
 
 %beta_matrix_corrected = zeros(length(sigma_list)*2,4);
@@ -336,12 +336,12 @@ ewpo_correction(sigma_ind,:) = tau_xu_hat./sigma_ux_hat;
 beta_matrix_corrected((sigma_ind-1)*2+1,1) = 0;
 beta_matrix_corrected((sigma_ind-1)*2+1,2) = nanmean(b_hat_all(2,:)-tau_xu_hat./sigma_ux_hat,2);
 beta_matrix_corrected(sigma_ind*2,1) = 0;
-beta_matrix_corrected(sigma_ind*2,2) = nanstd(b_hat_all(2,:)-tau_xu_hat./sigma_ux_hat,2);
+beta_matrix_corrected(sigma_ind*2,2) = nanstd(b_hat_all(2,:)-tau_xu_hat./sigma_ux_hat);
 % OLS corrected
-beta_matrix_corrected((sigma_ind-1)*2+1,1) = 0;
-beta_matrix_corrected((sigma_ind-1)*2+1,2) = nanmean(b_hat_all_ols(2,:)-sigma_ux_hat./var_x,2);
-beta_matrix_corrected(sigma_ind*2,1) = 0;
-beta_matrix_corrected(sigma_ind*2,2) = nanstd(b_hat_all_ols(2,:)-sigma_ux_hat./var_x,2);
+beta_matrix_corrected((sigma_ind-1)*2+1,3) = 0;
+beta_matrix_corrected((sigma_ind-1)*2+1,4) = nanmean(b_hat_all_ols(2,:)-sigma_ux_hat./var_x,2);
+beta_matrix_corrected(sigma_ind*2,3) = 0;
+beta_matrix_corrected(sigma_ind*2,4) = nanstd(b_hat_all_ols(2,:)-sigma_ux_hat./var_x);
 
 
 
