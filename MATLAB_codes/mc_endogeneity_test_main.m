@@ -174,6 +174,9 @@ run('ewpo_testing_2estimators_fullpairwise')
 % Normal %
 %%%%%%%%%%
 
+%sorted = '';
+sorted = 'sorted_';
+
 %Normal
 T_list = [10, 50, 100, 500, 1000];
 %reload and combine data

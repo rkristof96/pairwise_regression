@@ -15,9 +15,12 @@ date_var = datestr(datetime('today'));
  T_list = [10,50,100,500,1000];%[10,50,100,500,1000];
  % correlation between x and u
  sigma_list = [0,0.2,0.5,0.8];
- % covariances between residuals used to generate the data
- cov_list = [0,0.0585,0.3738,0.9594];
-
+ % correlations between residuals used to generate the data
+ %if strcmp(version,'C')
+    cov_list = [0,0.0391,0.2493,0.6397];
+ %else
+ %   cov_list = [0,0,0,0];
+ %end
  
  reps = 1000;
 
@@ -65,7 +68,7 @@ mu(1) = mu_x;
 cov_matrix = zeros(reps+1);
 % assign correlation values between residuals
 % necessary for the data generation
-cov_matrix(:,:) = cov_list(sigma_ind); 
+cov_matrix(:,:) = cov_list(sigma_ind)*sigma_u*sigma_u; 
 % first row and column from the covariance matrix includes the correlation
 cov_matrix(1,:) = sigma*sigma_x*sigma_u;
 cov_matrix(:,1) = sigma*sigma_x*sigma_u;
@@ -96,7 +99,7 @@ if strcmp(dist,'norm')
 end
 
 if strcmp(dist,'student-t')
-%student-t case
+%uniform case
     rng('default')  % For reproducibility
     R = mvnrnd(mu,cov_matrix,T); % generate data
     x = R(:,1);
