@@ -148,7 +148,6 @@ writetable(noabs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwis
 % EwPO testing 2 estimators %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%% version = 'C';
 % case 1
 abs_dummy = 'True'; 
 dist = 'norm';

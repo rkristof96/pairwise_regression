@@ -16,7 +16,7 @@ date_var = datestr(datetime('today'));
  % correlation between x and u
  sigma_list = [0,0.2,0.5,0.8];
  % covariances between residuals used to generate the data
- cov_list = [0,0.0585,0.3738,0.9594];
+ cov_list = [0,0.0586,0.3739,0.9595];
 
  
  reps = 1000;
