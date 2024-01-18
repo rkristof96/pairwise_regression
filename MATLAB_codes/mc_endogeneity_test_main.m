@@ -287,6 +287,8 @@ writetable(noabs_data_table_ewpo_correction,strcat('Results/Excels/ewpo_testing_
 % Student-t %
 %%%%%%%%%%%%%
 
+sorted = '_sorted';
+
 %Student-t
 T_list = [10, 50, 100, 500, 1000];
 %reload and combine data
