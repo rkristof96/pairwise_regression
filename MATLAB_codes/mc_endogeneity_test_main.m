@@ -105,42 +105,55 @@ T_list = [10, 50, 100, 500, 1000];
 req_date ='08-Jan-2024';
 abs_beta_out =[];
 abs_diff_out =[];
+abs_diff_beta_out =[];
 
 
 noabs_beta_out =[];
 noabs_diff_out =[];
+noabs_diff_beta_out =[];
 
 for ss =1:length(T_list)
 
     abs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version_',version,'_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
     abs_diff_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_diff_matrix_version_',version,'_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+    abs_diff_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_diff_beta_version_',version,'_Abs_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
     
     abs_beta_out = [abs_beta_out,abs_beta_add.x'];
     abs_diff_out = [abs_diff_out,abs_diff_add.x'];
+    abs_diff_beta_out = [abs_diff_beta_out,abs_diff_beta_add.x'];
+
    
     noabs_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version_',version,'_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
     noabs_diff_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_diff_matrix_version_',version,'_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
-    
+    noabs_diff_beta_add = load(strcat('Results/ewpo_testing_fullpairwise',sorted,'_Unif_diff_beta_version_',version,'_deltax_T_',num2str(T_list(ss)),'_',req_date,'.mat'));
+
     noabs_beta_out = [noabs_beta_out,noabs_beta_add.x'];
     noabs_diff_out = [noabs_diff_out,noabs_diff_add.x'];
+    noabs_diff_beta_out = [noabs_diff_beta_out,noabs_diff_beta_add.x'];
 
 end
 
 
 abs_data_table_beta = table(abs_beta_out');
 abs_data_table_diff = table(abs_diff_out');
+abs_data_table_diff_beta = table(abs_diff_beta_out');
 
 
 noabs_data_table_beta = table(noabs_beta_out');
 noabs_data_table_diff = table(noabs_diff_out');
+noabs_data_table_diff_beta = table(abs_diff_beta_out');
+
 
 
 % % write output
 writetable(abs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version',version,'_Abs_deltax_', req_date,'.xlsx'))
 writetable(abs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_diff_version',version,'_Abs_deltax_', req_date,'.xlsx'))
+writetable(abs_data_table_diff_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_diff_beta_version',version,'_Abs_deltax_', req_date,'.xlsx'))
+
 
 writetable(noabs_data_table_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_beta_version',version,'_deltax_', req_date,'.xlsx'))
 writetable(noabs_data_table_diff,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_diff_version',version,'_deltax_', req_date,'.xlsx'))
+writetable(noabs_data_table_diff_beta,strcat('Results/Excels/ewpo_testing_fullpairwise',sorted,'_Unif_diff_beta_version',version,'_deltax_', req_date,'.xlsx'))
 
 
 %%
