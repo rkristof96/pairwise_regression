@@ -35,7 +35,9 @@ num_outliers = ceil(T/100);
 % outliers and multiply them by 10
 % repeated 1000 times for all replications
 for i = 1:reps
+    % index of positive outliers
    [Bsort Bidx] = getNElements(U_eps(:,i), num_outliers);
+   % index of positive and negative outliers
    %[Bsort Bidx] = getNElements_abs(U_eps(:,i), num_outliers);
    U_eps_outliers(Bidx,i) = U_eps_outliers(Bidx,i)*10;
 end
